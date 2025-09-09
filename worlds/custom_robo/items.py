@@ -139,7 +139,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
 PARTS_ITEM_TABLE: dict[str, CRItemData] = {
   "Ray 01": CRItemData(
     type="Body",
-    code=2,
+    code=18,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFB9F, bit_position=1)]
   )
