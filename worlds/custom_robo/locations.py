@@ -16,3 +16,7 @@ BATTLE_COUNTER: dict[str, CRLocationData] = {
     ram_addr=CRRawData(0x803BE7A7, ram_byte_size=7)
   )
 }
+
+LOCATION_TABLE: dict[str, CRLocationData] = {
+  **BATTLE_COUNTER,
+}
