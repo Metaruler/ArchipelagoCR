@@ -1114,7 +1114,96 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
   ),
 
   # Leg Parts
-  
+  "Standard Leg": CRItemData(
+    type="Leg",
+    code=170,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1F, bit_position=1)]
+  ),
+  "High Jump": CRItemData(
+    type="Leg",
+    code=171,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1F, bit_position=2)]
+  ),
+  "Ground": CRItemData(
+    type="Leg",
+    code=172,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1F, bit_position=3)]
+  ),
+  "Formula": CRItemData(
+    type="Leg",
+    code=173,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1F, bit_position=4)]
+  ),
+  "Stabilizer": CRItemData(
+    type="Leg",
+    code=174,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1F, bit_position=5)]
+  ),
+  "Short Thrust": CRItemData(
+    type="Leg",
+    code=175,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1F, bit_position=6)]
+  ),
+  "Long Thrust": CRItemData(
+    type="Leg",
+    code=176,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1F, bit_position=7)]
+  ),
+  "Quick Jump": CRItemData(
+    type="Leg",
+    code=177,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1F, bit_position=8)]
+  ),
+  "Feather": CRItemData(
+    type="Leg",
+    code=178,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1E, bit_position=1)]
+  ),
+  "Wide Jump": CRItemData(
+    type="Leg",
+    code=179,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1E, bit_position=2)]
+  ),
+  "Can Leg": CRItemData(
+    type="Leg",
+    code=178,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1E, bit_position=3)]
+  ),
+  "Booster": CRItemData(
+    type="Leg",
+    code=179,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1E, bit_position=4)]
+  ),
+  "Swallow": CRItemData(
+    type="Leg",
+    code=180,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1E, bit_position=5)]
+  ),
+  "Raven": CRItemData(
+    type="Leg",
+    code=181,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1E, bit_position=6)]
+  ),
+  "Eclipse": CRItemData(
+    type="Leg",
+    code=182,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC1E, bit_position=7)]
+  )
 }
 
 # Rahu evolution tables
