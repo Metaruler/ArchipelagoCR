@@ -866,6 +866,254 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
   ),
 
   #Pod Parts
+  "Standard Pod": CRItemData(
+    type="Pod",
+    code=130,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFF, bit_position=1)]
+  ),
+  "Seeker F": CRItemData(
+    type="Pod",
+    code=131,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFF, bit_position=2)]
+  ),
+  "Seeker G": CRItemData(
+    type="Pod",
+    code=132,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFF, bit_position=3)]
+  ),
+  "Speed D": CRItemData(
+    type="Pod",
+    code=133,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFF, bit_position=4)]
+  ),
+  "Speed P": CRItemData(
+    type="Pod",
+    code=134,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFF, bit_position=5)]
+  ),
+  "Cockroach G": CRItemData(
+    type="Pod",
+    code=135,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFF, bit_position=6)]
+  ),
+  "Cockroach H": CRItemData(
+    type="Pod",
+    code=136,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFF, bit_position=7)]
+  ),
+  "Dolphin": CRItemData(
+    type="Pod",
+    code=137,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFF, bit_position=8)]
+  ),
+  "Dolphin G": CRItemData(
+    type="Pod",
+    code=138,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFE, bit_position=1)]
+  ),
+  "Spider": CRItemData(
+    type="Pod",
+    code=139,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFE, bit_position=2)]
+  ),
+  "Spider G": CRItemData(
+    type="Pod",
+    code=140,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFE, bit_position=3)]
+  ),
+  "Sky Freeze": CRItemData(
+    type="Pod",
+    code=141,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFE, bit_position=4)]
+  ),
+  "Ground Freeze": CRItemData(
+    type="Pod",
+    code=142,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFE, bit_position=5)]
+  ),
+  "Feint F": CRItemData(
+    type="Pod",
+    code=143,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFE, bit_position=6)]
+  ),
+  "Feint G": CRItemData(
+    type="Pod",
+    code=144,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFE, bit_position=7)]
+  ),
+  "Float F": CRItemData(
+    type="Pod",
+    code=145,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFE, bit_position=8)]
+  ),
+  "Jumping B": CRItemData(
+    type="Pod",
+    code=146,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFD, bit_position=1)]
+  ),
+  "Jumping G": CRItemData(
+    type="Pod",
+    code=147,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFD, bit_position=2)]
+  ),
+  "Diving": CRItemData(
+    type="Pod",
+    code=148,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFD, bit_position=3)]
+  ),
+  "Wave Pod": CRItemData(
+    type="Pod",
+    code=149,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFD, bit_position=4)]
+  ),
+  "Satellite": CRItemData(
+    type="Pod",
+    code=150,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFD, bit_position=5)]
+  ),
+  "Satellite H": CRItemData(
+    type="Pod",
+    code=151,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFD, bit_position=6)]
+  ),
+  "Beast F": CRItemData(
+    type="Pod",
+    code=152,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFD, bit_position=7)]
+  ),
+  "Trio H": CRItemData(
+    type="Pod",
+    code=153,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFD, bit_position=8)]
+  ),
+  "Wall Pod": CRItemData(
+    type="Pod",
+    code=154,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFC, bit_position=1)]
+  ),
+  "Reflection": CRItemData(
+    type="Pod",
+    code=155,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFC, bit_position=2)]
+  ),
+  "Caboose C": CRItemData(
+    type="Pod",
+    code=156,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFC, bit_position=3)]
+  ),
+  "Caboose T": CRItemData(
+    type="Pod",
+    code=157,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFC, bit_position=4)]
+  ),
+  "Twin Flank F": CRItemData(
+    type="Pod",
+    code=158,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFC, bit_position=5)]
+  ),
+  "Twin Flank G": CRItemData(
+    type="Pod",
+    code=159,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFC, bit_position=6)]
+  ),
+  "Umbrella": CRItemData(
+    type="Pod",
+    code=160,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFC, bit_position=7)]
+  ),
+  "Throwing D": CRItemData(
+    type="Pod",
+    code=161,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBFC, bit_position=8)]
+  ),
+  "Throwing P": CRItemData(
+    type="Pod",
+    code=162,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC03, bit_position=1)]
+  ),
+  "Double Wave": CRItemData(
+    type="Pod",
+    code=163,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC03, bit_position=2)]
+  ),
+  "Titan Pod": CRItemData(
+    type="Pod",
+    code=163,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC03, bit_position=3)]
+  ),
+  "Can Pod": CRItemData(
+    type="Pod",
+    code=164,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC03, bit_position=4)]
+  ),
+  "Standard F": CRItemData(
+    type="Pod",
+    code=165,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC03, bit_position=5)]
+  ),
+  "Caboose X": CRItemData(
+    type="Pod",
+    code=166,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC03, bit_position=6)]
+  ),
+  "Cheetah": CRItemData(
+    type="Pod",
+    code=167,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC03, bit_position=7)]
+  ),
+  "Wolf Spider": CRItemData(
+    type="Pod",
+    code=168,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC03, bit_position=8)]
+  ),
+  "Orca": CRItemData(
+    type="Pod",
+    code=169,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFC02, bit_position=1)]
+  ),
+
+  # Leg Parts
   
 }
 
