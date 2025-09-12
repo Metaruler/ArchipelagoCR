@@ -12,6 +12,7 @@ class CRItemData(NamedTuple):
   update_ram_addr: Optional[list[CRRawData]] = None
 
 # Begin item list for AP
+# Scenario progression gates needed to move to next chapter
 PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
   "Progressive Scenario": [
     CRItemData(
@@ -136,7 +137,9 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
   ]
 }
 
+# Full parts table minus Rahu
 PARTS_ITEM_TABLE: dict[str, CRItemData] = {
+  # Body Parts
   "Ray 01": CRItemData(
     type="Body",
     code=18,
@@ -317,20 +320,556 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFB9C, bit_position=6)]
   ),
-  "Rahu I": CRItemData(
+  "Chickenheart": CRItemData(
     type="Body",
     code=48,
     classification=IC.useful,
-    update_ram_addr=[CRRawData(0x803BFB9C, bit_position=7)]
+    update_ram_addr=[CRRawData(0x803BFBA3, bit_position=2)]
   ),
-  "Rahu II": CRItemData(
-    type="Body",
-    code=44,
+  
+  # Gun Parts
+  "Basic": CRItemData(
+    type="Gun",
+    code=49,
     classification=IC.useful,
-    update_ram_addr=[CRRawData(0x803BFB9C, bit_position=3)]
+    update_ram_addr=[CRRawData(0x803BFBBF, bit_position=1)]
   ),
+  "3-Way": CRItemData(
+    type="Gun",
+    code=50,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBF, bit_position=2)]
+  ),
+  "Gatling": CRItemData(
+    type="Gun",
+    code=51,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBF, bit_position=3)]
+  ),
+  "Vertical": CRItemData(
+    type="Gun",
+    code=52,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBF, bit_position=4)]
+  ),
+  "Sniper": CRItemData(
+    type="Gun",
+    code=53,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBF, bit_position=5)]
+  ),
+  "Stun": CRItemData(
+    type="Gun",
+    code=54,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBF, bit_position=6)]
+  ),
+  "Hornet": CRItemData(
+    type="Gun",
+    code=55,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBF, bit_position=7)]
+  ),
+  "Flame": CRItemData(
+    type="Gun",
+    code=56,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBF, bit_position=8)]
+  ),
+  "Dragon": CRItemData(
+    type="Gun",
+    code=57,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBE, bit_position=1)]
+  ),
+  "Splash": CRItemData(
+    type="Gun",
+    code=58,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBE, bit_position=2)]
+  ),
+  "Left Arc": CRItemData(
+    type="Gun",
+    code=59,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBE, bit_position=3)]
+  ),
+  "Right Arc": CRItemData(
+    type="Gun",
+    code=60,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBE, bit_position=4)]
+  ),
+  "Shotgun": CRItemData(
+    type="Gun",
+    code=61,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBE, bit_position=5)]
+  ),
+  "Rayfall": CRItemData(
+    type="Gun",
+    code=62,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBE, bit_position=6)]
+  ),
+  "Bubble": CRItemData(
+    type="Gun",
+    code=63,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBE, bit_position=7)]
+  ),
+  "Eagle": CRItemData(
+    type="Gun",
+    code=64,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBE, bit_position=8)]
+  ),
+  "V Laser": CRItemData(
+    type="Gun",
+    code=65,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBD, bit_position=1)]
+  ),
+  "Magnum": CRItemData(
+    type="Gun",
+    code=66,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBD, bit_position=2)]
+  ),
+  "Needle": CRItemData(
+    type="Gun",
+    code=67,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBD, bit_position=3)]
+  ),
+  "Starshot": CRItemData(
+    type="Gun",
+    code=68,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBD, bit_position=4)]
+  ),
+  "Glider": CRItemData(
+    type="Gun",
+    code=69,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBD, bit_position=5)]
+  ),
+  "Homing Star": CRItemData(
+    type="Gun",
+    code=70,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBD, bit_position=6)]
+  ),
+  "Trap": CRItemData(
+    type="Gun",
+    code=71,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBD, bit_position=7)]
+  ),
+  "Drill": CRItemData(
+    type="Gun",
+    code=72,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBD, bit_position=8)]
+  ),
+  "Titan Gun": CRItemData(
+    type="Gun",
+    code=73,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBC, bit_position=1)]
+  ),
+  "Claw": CRItemData(
+    type="Gun",
+    code=74,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBC, bit_position=2)]
+  ),
+  "Knuckle": CRItemData(
+    type="Gun",
+    code=75,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBC, bit_position=3)]
+  ),
+  "Afterburner": CRItemData(
+    type="Gun",
+    code=76,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBC, bit_position=4)]
+  ),
+  "Blade": CRItemData(
+    type="Gun",
+    code=77,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBC, bit_position=5)]
+  ),
+  "Meteor Storm": CRItemData(
+    type="Gun",
+    code=78,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBC, bit_position=6)]
+  ),
+  "Twin Fang": CRItemData(
+    type="Gun",
+    code=79,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBC, bit_position=7)]
+  ),
+  "Gravity": CRItemData(
+    type="Gun",
+    code=80,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBBC, bit_position=8)]
+  ),
+  "Phoenix": CRItemData(
+    type="Gun",
+    code=73,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC3, bit_position=1)]
+  ),
+  "Can Gun": CRItemData(
+    type="Gun",
+    code=74,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC3, bit_position=2)]
+  ),
+  "Left Pulse": CRItemData(
+    type="Gun",
+    code=75,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC3, bit_position=3)]
+  ),
+  "Right Pulse": CRItemData(
+    type="Gun",
+    code=76,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC3, bit_position=4)]
+  ),
+  "Sword Storm": CRItemData(
+    type="Gun",
+    code=77,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC3, bit_position=5)]
+  ),
+  "Ion": CRItemData(
+    type="Gun",
+    code=78,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC3, bit_position=6)]
+  ),
+  "Flare": CRItemData(
+    type="Gun",
+    code=79,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC3, bit_position=7)]
+  ),
+  "Left 5-Way": CRItemData(
+    type="Gun",
+    code=80,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC3, bit_position=8)]
+  ),
+  "Right 5-Way": CRItemData(
+    type="Gun",
+    code=81,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC2, bit_position=1)]
+  ),
+  "Halo": CRItemData(
+    type="Gun",
+    code=82,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC2, bit_position=2)]
+  ),
+  "Wave Laser": CRItemData(
+    type="Gun",
+    code=83,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC2, bit_position=3)]
+  ),
+  "X Laser": CRItemData(
+    type="Gun",
+    code=84,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC2, bit_position=4)]
+  ),
+  "Crystal Strike": CRItemData(
+    type="Gun",
+    code=85,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC2, bit_position=5)]
+  ),
+  "Wyrm": CRItemData(
+    type="Gun",
+    code=86,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC2, bit_position=6)]
+  ),
+  "Raptor": CRItemData(
+    type="Gun",
+    code=87,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC2, bit_position=7)]
+  ),
+  "Waxing Arc Gun": CRItemData(
+    type="Gun",
+    code=88,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC2, bit_position=8)]
+  ),
+  "Waning Arc Gun": CRItemData(
+    type="Gun",
+    code=89,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBC1, bit_position=1)]
+  ),
+  
+  # Bomb Parts
+  "Standard Bomb": CRItemData(
+    type="Bomb",
+    code=90,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDF, bit_position=1)]
+  ),
+  "Standard F": CRItemData(
+    type="Bomb",
+    code=91,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDF, bit_position=2)]
+  ),
+  "Standard S": CRItemData(
+    type="Bomb",
+    code=92,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDF, bit_position=3)]
+  ),
+  "Wave Bomb": CRItemData(
+    type="Bomb",
+    code=93,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDF, bit_position=4)]
+  ),
+  "Straight G": CRItemData(
+    type="Bomb",
+    code=94,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDF, bit_position=5)]
+  ),
+  "Straight S": CRItemData(
+    type="Bomb",
+    code=95,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDF, bit_position=6)]
+  ),
+  "Straight T": CRItemData(
+    type="Bomb",
+    code=96,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDF, bit_position=7)]
+  ),
+  "Right Flank H": CRItemData(
+    type="Bomb",
+    code=97,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDF, bit_position=8)]
+  ),
+  "Left Flank H": CRItemData(
+    type="Bomb",
+    code=98,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDE, bit_position=1)]
+  ),
+  "Right Wave": CRItemData(
+    type="Bomb",
+    code=99,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDE, bit_position=2)]
+  ),
+  "Left Wave": CRItemData(
+    type="Bomb",
+    code=100,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDE, bit_position=3)]
+  ),
+  "Burrow D": CRItemData(
+    type="Bomb",
+    code=101,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDE, bit_position=4)]
+  ),
+  "Burrow P": CRItemData(
+    type="Bomb",
+    code=102,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDE, bit_position=5)]
+  ),
+  "Freeze": CRItemData(
+    type="Bomb",
+    code=103,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDE, bit_position=6)]
+  ),
+  "Tomahawk B": CRItemData(
+    type="Bomb",
+    code=104,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDE, bit_position=7)]
+  ),
+  "Tomahawk G": CRItemData(
+    type="Bomb",
+    code=105,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDE, bit_position=8)]
+  ),
+  "Gemini B": CRItemData(
+    type="Bomb",
+    code=106,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDD, bit_position=1)]
+  ),
+  "Gemini P": CRItemData(
+    type="Bomb",
+    code=107,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDD, bit_position=2)]
+  ),
+  "Submarine D": CRItemData(
+    type="Bomb",
+    code=108,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDD, bit_position=3)]
+  ),
+  "Submarine P": CRItemData(
+    type="Bomb",
+    code=109,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDD, bit_position=4)]
+  ),
+  "Crescent P": CRItemData(
+    type="Bomb",
+    code=110,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDD, bit_position=5)]
+  ),
+  "Crescent C": CRItemData(
+    type="Bomb",
+    code=111,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDD, bit_position=6)]
+  ),
+  "Dual": CRItemData(
+    type="Bomb",
+    code=112,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDD, bit_position=7)]
+  ),
+  "Dual C": CRItemData(
+    type="Bomb",
+    code=113,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDD, bit_position=8)]
+  ),
+  "Acrobat": CRItemData(
+    type="Bomb",
+    code=114,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDC, bit_position=1)]
+  ),
+  "Delta": CRItemData(
+    type="Bomb",
+    code=115,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDC, bit_position=2)]
+  ),
+  "Wall Bomb": CRItemData(
+    type="Bomb",
+    code=116,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDC, bit_position=3)]
+  ),
+  "Smash": CRItemData(
+    type="Bomb",
+    code=117,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDC, bit_position=4)]
+  ),
+  "Double Mine": CRItemData(
+    type="Bomb",
+    code=118,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDC, bit_position=5)]
+  ),
+  "Geo Trap": CRItemData(
+    type="Bomb",
+    code=119,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDC, bit_position=6)]
+  ),
+  "Titan Bomb": CRItemData(
+    type="Bomb",
+    code=120,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDC, bit_position=7)]
+  ),
+  "Can Bomb": CRItemData(
+    type="Bomb",
+    code=121,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBDC, bit_position=8)]
+  ),
+  "Standard K": CRItemData(
+    type="Bomb",
+    code=122,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBE3, bit_position=1)]
+  ),
+  "Submarine K": CRItemData(
+    type="Bomb",
+    code=123,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBE3, bit_position=2)]
+  ),
+  "Crescent K": CRItemData(
+    type="Bomb",
+    code=124,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBE3, bit_position=3)]
+  ),
+  "Standard X": CRItemData(
+    type="Bomb",
+    code=125,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBE3, bit_position=4)]
+  ),
+  "Treble": CRItemData(
+    type="Bomb",
+    code=126,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBE3, bit_position=5)]
+  ),
+  "Wyvern": CRItemData(
+    type="Bomb",
+    code=127,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBE3, bit_position=6)]
+  ),
+  "Waxing Arc Bomb": CRItemData(
+    type="Bomb",
+    code=128,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBE3, bit_position=7)]
+  ),
+  "Waning Arc Bomb": CRItemData(
+    type="Bomb",
+    code=129,
+    classification=IC.useful,
+    update_ram_addr=[CRRawData(0x803BFBE3, bit_position=8)]
+  ),
+
+  #Pod Parts
+  
 }
 
+# Rahu evolution tables
 PROGRESSION_RAHU_BODY: dict[str, CRItemData] = {
   "Rahu Body Upgrade": [
     CRItemData(
