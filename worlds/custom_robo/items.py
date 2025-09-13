@@ -5,6 +5,7 @@ from BaseClasses import ItemClassification as IC
 
 # Item Class
 class CRItemData(NamedTuple):
+  name: Optional[str] = None
   type: str
   code: Optional[int]
   classification: IC
@@ -1207,34 +1208,48 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
 }
 
 # Rahu evolution tables
-PROGRESSION_RAHU_BODY: dict[str, CRItemData] = {
+PROGRESSION_RAHU_BODY: dict[str, list[CRItemData]] = {
   "Rahu Body Upgrade": [
     CRItemData(
-      type="Rahu I",
-      code=1,
+      name="Grand Cross Bomb",
+      type="Rahu Part",
+      code=194,
       classification=IC.progression,
-      item_id=1,
-      update_ram_addr=None
+      update_ram_addr=[CRRawData(0x803BFBE2, bit_position=1)]
     ),
     CRItemData(
-      type="Rahu II",
-      code=2,
+      name="Ultimate Legs",
+      type="Rahu Part",
+      code=195,
       classification=IC.progression,
-      item_id=2,
-      update_ram_addr=None
+      update_ram_addr=[CRRawData(0x803BFC1E, bit_position=1)]
     ),
     CRItemData(
-      type="Rahu III",
-      code=3,
+      name="Rahu I",
+      type="Rahu Part",
+      code=196,
       classification=IC.progression,
-      item_id=3,
-      update_ram_addr=None
+      update_ram_addr=[CRRawData(0x803BFB9C, bit_position=7)]
+    ),
+    CRItemData(
+      name="Rahu II",
+      type="Rahu Part",
+      code=197,
+      classification=IC.progression,
+      update_ram_addr=[CRRawData(0x803BFB9C, bit_position=8)]
+    ),
+    CRItemData(
+      name="Rahu III",
+      type="Rahu Part",
+      code=198,
+      classification=IC.progression,
+      update_ram_addr=[CRRawData(0x803BFBA3, bit_position=1)]
     )
   ]
 }
 
 ALL_ITEMS_TABLE = {
   **PROGRESSION_SCENARIO_TABLE,
-  **PARTS_ITEM_TABLE
+  **PARTS_ITEM_TABLE,
   **PROGRESSION_RAHU_BODY
 }
