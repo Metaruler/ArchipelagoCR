@@ -286,7 +286,7 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     update_ram_addr=[CRRawData(0x803BFB9D, bit_position=8)]
   ),
   "Ray Legend": CRItemData(
-    type="Body",
+    type="Illegal Body",
     code=42,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFB9C, bit_position=1)]
@@ -298,25 +298,25 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     update_ram_addr=[CRRawData(0x803BFB9C, bit_position=2)]
   ),
   "Ray Warrior": CRItemData(
-    type="Body",
+    type="Illegal Body",
     code=44,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFB9C, bit_position=3)]
   ),
   "Rakansen": CRItemData(
-    type="Body",
+    type="Illegal Body",
     code=45,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFB9C, bit_position=4)]
   ),
   "Ruhiel": CRItemData(
-    type="Body",
+    type="Illegal Body",
     code=46,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFB9C, bit_position=5)]
   ),
   "Athena": CRItemData(
-    type="Body",
+    type="Illegal Body",
     code=47,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFB9C, bit_position=6)]
@@ -582,43 +582,43 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     update_ram_addr=[CRRawData(0x803BFBC2, bit_position=2)]
   ),
   "Wave Laser": CRItemData(
-    type="Gun",
+    type="Illegal Gun",
     code=91,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFBC2, bit_position=3)]
   ),
   "X Laser": CRItemData(
-    type="Gun",
+    type="Illegal Gun",
     code=92,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFBC2, bit_position=4)]
   ),
   "Crystal Strike": CRItemData(
-    type="Gun",
+    type="Illegal Gun",
     code=93,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFBC2, bit_position=5)]
   ),
   "Wyrm": CRItemData(
-    type="Gun",
+    type="Illegal Gun",
     code=94,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFBC2, bit_position=6)]
   ),
   "Raptor": CRItemData(
-    type="Gun",
+    type="Illegal Gun",
     code=95,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFBC2, bit_position=7)]
   ),
   "Waxing Arc Gun": CRItemData(
-    type="Gun",
+    type="Illegal Gun",
     code=96,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFBC2, bit_position=8)]
   ),
   "Waning Arc Gun": CRItemData(
-    type="Gun",
+    type="Illegal Gun",
     code=97,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFBC1, bit_position=1)]
@@ -1096,19 +1096,19 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     update_ram_addr=[CRRawData(0x803BFC03, bit_position=6)]
   ),
   "Cheetah": CRItemData(
-    type="Pod",
+    type="Illegal Pod",
     code=176,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFC03, bit_position=7)]
   ),
   "Wolf Spider": CRItemData(
-    type="Pod",
+    type="Illegal Pod",
     code=177,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFC03, bit_position=8)]
   ),
   "Orca": CRItemData(
-    type="Pod",
+    type="Illegal Pod",
     code=178,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFC02, bit_position=1)]
@@ -1188,19 +1188,19 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     update_ram_addr=[CRRawData(0x803BFC1E, bit_position=4)]
   ),
   "Swallow": CRItemData(
-    type="Leg",
+    type="Illegal Leg",
     code=191,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFC1E, bit_position=5)]
   ),
   "Raven": CRItemData(
-    type="Leg",
+    type="Illegal Leg",
     code=192,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFC1E, bit_position=6)]
   ),
   "Eclipse": CRItemData(
-    type="Leg",
+    type="Illegal Leg",
     code=193,
     classification=IC.useful,
     update_ram_addr=[CRRawData(0x803BFC1E, bit_position=7)]
