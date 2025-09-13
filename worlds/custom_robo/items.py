@@ -17,6 +17,7 @@ class CRItemData(NamedTuple):
 PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
   "Progressive Scenario": [
     CRItemData(
+      name="Chapter 1",
       type="Chapter",
       code=1,
       classification=IC.progression,
@@ -24,6 +25,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 2",
       type="Chapter",
       code=2,
       classification=IC.progression,
@@ -31,6 +33,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 3",
       type="Chapter",
       code=3,
       classification=IC.progression,
@@ -38,6 +41,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 4",
       type="Chapter",
       code=4,
       classification=IC.progression,
@@ -45,6 +49,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 5",
       type="Chapter",
       code=5,
       classification=IC.progression,
@@ -52,6 +57,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 6",
       type="Chapter",
       code=6,
       classification=IC.progression,
@@ -59,6 +65,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 7",
       type="Chapter",
       code=7,
       classification=IC.progression,
@@ -66,6 +73,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 8",
       type="Chapter",
       code=8,
       classification=IC.progression,
@@ -73,6 +81,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 9",
       type="Chapter",
       code=9,
       classification=IC.progression,
@@ -80,6 +89,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 10",
       type="Chapter",
       code=10,
       classification=IC.progression,
@@ -87,6 +97,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 11",
       type="Chapter",
       code=11,
       classification=IC.progression,
@@ -94,6 +105,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 12",
       type="Chapter",
       code=12,
       classification=IC.progression,
@@ -101,6 +113,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 13",
       type="Chapter",
       code=13,
       classification=IC.progression,
@@ -108,6 +121,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 14",
       type="Chapter",
       code=14,
       classification=IC.progression,
@@ -115,6 +129,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 15",
       type="Chapter",
       code=15,
       classification=IC.progression,
@@ -122,6 +137,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 16",
       type="Chapter",
       code=16,
       classification=IC.progression,
@@ -129,6 +145,7 @@ PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
       update_ram_addr=None
     ),
     CRItemData(
+      name="Chapter 17",
       type="Chapter",
       code=17,
       classification=IC.progression,
