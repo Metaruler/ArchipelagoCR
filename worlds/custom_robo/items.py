@@ -1214,77 +1214,77 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
       name="Rahu I",
       type="Rahu Part",
       code=194,
-      classification=IC.progression,
+      classification=IC.useful,
       update_ram_addr=[CRRawData(0x803BFB9C, bit_position=7)]
     ),
     CRItemData(
       name="Penumbra I Pod",
       type="Rahu Part",
       code=195,
-      classification=IC.progression,
+      classification=IC.useful,
       update_ram_addr=[CRRawData(0x803BFC02, bit_position=2)]
     ),
     CRItemData(
       name="Rahu I Gun",
       type="Rahu Part",
       code=196,
-      classification=IC.progression,
+      classification=IC.useful,
       update_ram_addr=[CRRawData(0x803BFBC1, bit_position=2)]
     ),
     CRItemData(
       name="Rahu II",
       type="Rahu Part",
       code=197,
-      classification=IC.progression,
+      classification=IC.useful,
       update_ram_addr=[CRRawData(0x803BFB9C, bit_position=8)]
     ),
     CRItemData(
       name="Penumbra II Pod",
       type="Rahu Part",
       code=198,
-      classification=IC.progression,
+      classification=IC.useful,
       update_ram_addr=[CRRawData(0x803BFC02, bit_position=3)]
     ),
     CRItemData(
       name="Rahu II Gun",
       type="Rahu Part",
       code=199,
-      classification=IC.progression,
+      classification=IC.useful,
       update_ram_addr=[CRRawData(0x803BFBC1, bit_position=3)]
     ),
     CRItemData(
       name="Grand Cross Bomb",
       type="Rahu Part",
       code=200,
-      classification=IC.progression,
+      classification=IC.useful,
       update_ram_addr=[CRRawData(0x803BFBE2, bit_position=1)]
     ),
     CRItemData(
       name="Ultimate Legs",
       type="Rahu Part",
       code=201,
-      classification=IC.progression,
+      classification=IC.useful,
       update_ram_addr=[CRRawData(0x803BFC1E, bit_position=1)]
     ),
     CRItemData(
       name="Rahu III",
       type="Rahu Part",
       code=202,
-      classification=IC.progression,
+      classification=IC.useful,
       update_ram_addr=[CRRawData(0x803BFBA3, bit_position=1)]
     ),
     CRItemData(
       name="Penumbra III Pod",
       type="Rahu Part",
       code=203,
-      classification=IC.progression,
+      classification=IC.useful,
       update_ram_addr=[CRRawData(0x803BFC02, bit_position=4)]
     ),
     CRItemData(
       name="Rahu III Gun",
       type="Rahu Part",
       code=204,
-      classification=IC.progression,
+      classification=IC.useful,
       update_ram_addr=[CRRawData(0x803BFBC1, bit_position=4)]
     ),
   ]
