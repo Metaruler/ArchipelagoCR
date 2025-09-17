@@ -4,7 +4,7 @@ from .Items import CRItemData
 from .Helpers import CRRawData
 
 class CRLocationData(NamedTuple):
-  name:str
+  game:str = "Custom Robo"
   code:Optional[int]
   ram_addr: Optional[CRRawData] = None
 
