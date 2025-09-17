@@ -8,17 +8,8 @@ class CRLocationData(NamedTuple):
   code:Optional[int]
   ram_addr: Optional[CRRawData] = None
 
-
-# Check for each part being used in a victory
-PART_USE: dict[str, CRLocationData] = {
-  "Use Ray 01": CRLocationData(
-    name="Battles",
-    code=1,
-    ram_addr=CRRawData(0x803BE7A7, ram_byte_size=7)
-  )
-}
-
 # Begin check logic
+# Each battle counts as a check
 BATTLE_COUNTER: dict[str, CRLocationData] = {
   "Battles Won": CRLocationData(
     name="Battles",
@@ -27,7 +18,18 @@ BATTLE_COUNTER: dict[str, CRLocationData] = {
   )
 }
 
+# Check for each part being used in a victory
+PART_USE: dict[str, CRLocationData] = {
+  "Use Ray 01": CRLocationData(
+    name="Battles",
+    code=2,
+    ram_addr=CRRawData(0x803BE7A7, ram_byte_size=7)
+  )
+}
+
+
+
 LOCATION_TABLE: dict[str, CRLocationData] = {
-  **PART_USE,
-  **BATTLE_COUNTER
+  **BATTLE_COUNTER,
+  **PART_USE
 }
