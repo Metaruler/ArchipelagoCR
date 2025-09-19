@@ -110,7 +110,7 @@ PART_USE: dict[str, CRLocationData] = {
   ),
   "Use Ray Legend": CRLocationData(
     code=25,
-    ram_addr=CRRamData(0x803BFBA4, bit_position=1)
+    ram_addr=CRRamData(0x803BFBA4, bit_position=1),
     illegal=True
   ),
   "Use Oil Can": CRLocationData(
@@ -119,37 +119,37 @@ PART_USE: dict[str, CRLocationData] = {
   ),
   "Use Ray Warrior": CRLocationData(
     code=27,
-    ram_addr=CRRamData(0x803BFBA4, bit_position=3)
+    ram_addr=CRRamData(0x803BFBA4, bit_position=3),
     illegal=True
   ),
   "Use Rakansen": CRLocationData(
     code=28,
-    ram_addr=CRRamData(0x803BFBA4, bit_position=4)
+    ram_addr=CRRamData(0x803BFBA4, bit_position=4),
     illegal=True
   ),
   "Use Ruhiel": CRLocationData(
     code=29,
-    ram_addr=CRRamData(0x803BFBA4, bit_position=5)
+    ram_addr=CRRamData(0x803BFBA4, bit_position=5),
     illegal=True
   ),
   "Use Athena": CRLocationData(
     code=30,
-    ram_addr=CRRamData(0x803BFBA4, bit_position=6)
+    ram_addr=CRRamData(0x803BFBA4, bit_position=6),
     illegal=True
   ),
   "Use Rahu I": CRLocationData(
     code=31,
-    ram_addr=CRRamData(0x803BFBA4, bit_position=7)
+    ram_addr=CRRamData(0x803BFBA4, bit_position=7),
     illegal=True
   ),
   "Use Rahu II": CRLocationData(
     code=32,
-    ram_addr=CRRamData(0x803BFBA4, bit_position=8)
+    ram_addr=CRRamData(0x803BFBA4, bit_position=8),
     illegal=True
   ),
   "Use Rahu III": CRLocationData(
     code=33,
-    ram_addr=CRRamData(0x803BFBAB, bit_position=1)
+    ram_addr=CRRamData(0x803BFBAB, bit_position=1),
     illegal=True
   ),
   "Use Chickenheart": CRLocationData(
@@ -326,52 +326,52 @@ PART_USE: dict[str, CRLocationData] = {
   ),
   "Use Wave Laser Gun": CRLocationData(
     code=77,
-    ram_addr=CRRamData(0x803BFBCA, bit_position=3)
+    ram_addr=CRRamData(0x803BFBCA, bit_position=3),
     illegal=True
   ),
   "Use X Laser Gun": CRLocationData(
     code=78,
-    ram_addr=CRRamData(0x803BFBCA, bit_position=4)
+    ram_addr=CRRamData(0x803BFBCA, bit_position=4),
     illegal=True
   ),
   "Use Crystal Strike Gun": CRLocationData(
     code=79,
-    ram_addr=CRRamData(0x803BFBCA, bit_position=5)
+    ram_addr=CRRamData(0x803BFBCA, bit_position=5),
     illegal=True
   ),
   "Use Wyrm Gun": CRLocationData(
     code=80,
-    ram_addr=CRRamData(0x803BFBCA, bit_position=6)
+    ram_addr=CRRamData(0x803BFBCA, bit_position=6),
     illegal=True
   ),
   "Use Raptor Gun": CRLocationData(
     code=81,
-    ram_addr=CRRamData(0x803BFBCA, bit_position=7)
+    ram_addr=CRRamData(0x803BFBCA, bit_position=7),
     illegal=True
   ),
   "Use Waxing Arc Gun": CRLocationData(
     code=82,
-    ram_addr=CRRamData(0x803BFBCA, bit_position=8)
+    ram_addr=CRRamData(0x803BFBCA, bit_position=8),
     illegal=True
   ),
   "Use Waning Arc Gun": CRLocationData(
     code=83,
-    ram_addr=CRRamData(0x803BFBC9, bit_position=1)
+    ram_addr=CRRamData(0x803BFBC9, bit_position=1),
     illegal=True
   ),
   "Use Rahu I Gun": CRLocationData(
     code=84,
-    ram_addr=CRRamData(0x803BFBC9, bit_position=2)
+    ram_addr=CRRamData(0x803BFBC9, bit_position=2),
     illegal=True
   ),
   "Use Rahu II Gun": CRLocationData(
     code=85,
-    ram_addr=CRRamData(0x803BFBC9, bit_position=3)
+    ram_addr=CRRamData(0x803BFBC9, bit_position=3),
     illegal=True
   ),
   "Use Rahu III Gun": CRLocationData(
     code=86,
-    ram_addr=CRRamData(0x803BFBC9, bit_position=4)
+    ram_addr=CRRamData(0x803BFBC9, bit_position=4),
     illegal=True
   ),
   "Use Standard Bomb": CRLocationData(
@@ -520,27 +520,27 @@ PART_USE: dict[str, CRLocationData] = {
   ),
   "Use Treble Bomb": CRLocationData(
     code=122,
-    ram_addr=CRRamData(0x803BFBEB, bit_position=5)
+    ram_addr=CRRamData(0x803BFBEB, bit_position=5),
     illegal=True
   ),
   "Use Wyvern Bomb": CRLocationData(
     code=123,
-    ram_addr=CRRamData(0x803BFBEB, bit_position=6)
+    ram_addr=CRRamData(0x803BFBEB, bit_position=6),
     illegal=True
   ),
   "Use Waxing Arc Bomb": CRLocationData(
     code=124,
-    ram_addr=CRRamData(0x803BFBEB, bit_position=7)
+    ram_addr=CRRamData(0x803BFBEB, bit_position=7),
     illegal=True
   ),
   "Use Waning Arc Bomb": CRLocationData(
     code=125,
-    ram_addr=CRRamData(0x803BFBEB, bit_position=8)
+    ram_addr=CRRamData(0x803BFBEB, bit_position=8),
     illegal=True
   ),
   "Use Grand Cross Bomb": CRLocationData(
     code=126,
-    ram_addr=CRRamData(0x803BFBEA, bit_position=1)
+    ram_addr=CRRamData(0x803BFBEA, bit_position=1),
     illegal=True
   ),
   "Use Standard Pod": CRLocationData(
@@ -697,32 +697,32 @@ PART_USE: dict[str, CRLocationData] = {
   ),
   "Use Cheetah Pod": CRLocationData(
     code=165,
-    ram_addr=CRRamData(0x803BFC0B, bit_position=7)
+    ram_addr=CRRamData(0x803BFC0B, bit_position=7),
     illegal=True
   ),
   "Use Wolf Spider Pod": CRLocationData(
     code=166,
-    ram_addr=CRRamData(0x803BFC0B, bit_position=8)
+    ram_addr=CRRamData(0x803BFC0B, bit_position=8),
     illegal=True
   ),
   "Use Orca Pod": CRLocationData(
     code=167,
-    ram_addr=CRRamData(0x803BFC0A, bit_position=1)
+    ram_addr=CRRamData(0x803BFC0A, bit_position=1),
     illegal=True
   ),
   "Use Penumbra I Pod": CRLocationData(
     code=168,
-    ram_addr=CRRamData(0x803BFC0A, bit_position=2)
+    ram_addr=CRRamData(0x803BFC0A, bit_position=2),
     illegal=True
   ),
   "Use Penumbra II Pod": CRLocationData(
     code=169,
-    ram_addr=CRRamData(0x803BFC0A, bit_position=3)
+    ram_addr=CRRamData(0x803BFC0A, bit_position=3),
     illegal=True
   ),
   "Use Penumbra III Pod": CRLocationData(
     code=170,
-    ram_addr=CRRamData(0x803BFC0A, bit_position=4)
+    ram_addr=CRRamData(0x803BFC0A, bit_position=4),
     illegal=True
   ),
   "Use Standard Leg": CRLocationData(
@@ -775,22 +775,22 @@ PART_USE: dict[str, CRLocationData] = {
   ),
   "Use Swallow Leg": CRLocationData(
     code=183,
-    ram_addr=CRRamData(0x803BFC26, bit_position=5)
+    ram_addr=CRRamData(0x803BFC26, bit_position=5),
     illegal=True
   ),
   "Use Raven Leg": CRLocationData(
     code=184,
-    ram_addr=CRRamData(0x803BFC26, bit_position=6)
+    ram_addr=CRRamData(0x803BFC26, bit_position=6),
     illegal=True
   ),
   "Use Eclipse Leg": CRLocationData(
     code=185,
-    ram_addr=CRRamData(0x803BFC26, bit_position=7)
+    ram_addr=CRRamData(0x803BFC26, bit_position=7),
     illegal=True
   ),
   "Use Ultimate Leg": CRLocationData(
     code=186,
-    ram_addr=CRRamData(0x803BFC26, bit_position=8)
+    ram_addr=CRRamData(0x803BFC26, bit_position=8),
     illegal=True
   )
 }
