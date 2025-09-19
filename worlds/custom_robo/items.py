@@ -2,6 +2,7 @@ from typing import NamedTuple, Dict, Optional, Set
 
 from BaseClasses import Item
 from BaseClasses import ItemClassification as IC
+from .helpers import CRRamData
 
 # Item Class
 class CRItemData(NamedTuple):
