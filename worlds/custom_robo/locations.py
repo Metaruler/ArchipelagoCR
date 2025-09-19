@@ -12,10 +12,13 @@ class CRLocationData(NamedTuple):
 # Check for each part being used in a victory
 PART_USE: dict[str, CRLocationData] = {
   "Use Ray 01": CRLocationData(
-    name="Battles",
     code=1,
-    ram_addr=CRRawData(0x803BFBA7, bit=1)
-  )
+    ram_addr=CRRawData(0x803BFBA7, bit_position=1)
+  ),
+  "Use Splendor": CRLocationData(
+    code=2,
+    ram_addr=CRRawData(0x803BFBA7, bit_position=1)
+  ),
 }
 
 # Each battle counts as a check
