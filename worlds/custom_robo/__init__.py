@@ -3,13 +3,13 @@ from typing import ClassVar
 import random
 
 # AP Related Imports
-from BaseClasses import Item
+from BaseClasses import Item, Region
 from worlds.AutoWorld import WebWorld, World
 
 # Relative Imports
 from .helpers import *
-from .items import *
-from .locations import *
+from .items import ALL_ITEMS_TABLE, CRItem, FILLER_ITEMS
+from .locations import LOCATION_TABLE, CHAPTER_COUNTER
 from .options import *
 from .rules import *
 
