@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from Options import Choice, PerGameCommonOptions, DeathLinkMixin
+from Options import Choice, PerGameCommonOptions
 
 class IllegalPartsEnabled(Choice):
     """Choose whether Illegal Parts are included for drops and checks (enabled by default)"""
@@ -11,5 +11,5 @@ class IllegalPartsEnabled(Choice):
     default = True
 
 @dataclass
-class CROptions(DeathLinkMixin, PerGameCommonOptions):
+class CROptions(PerGameCommonOptions):
     illegal_parts_enabled: IllegalPartsEnabled
