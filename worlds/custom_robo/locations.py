@@ -822,13 +822,22 @@ BATTLE_COUNTER: dict[str, CRLocationData] = {
   "Battles Won": CRLocationData(
     name="Battles",
     code=187,
-    ram_addr=CRRamData(0x803BE7A7, bit_position=1, ram_byte_size=7)
+    ram_addr=CRRamData(0x803BF9C9, bit_position=1, ram_byte_size=8)
   )
+}
+
+CHAPTER_COUNTER: dict[str, CRLocationData] = {
+   "Current Chapter": CRLocationData(
+      name="Chapters",
+      code=None,
+      ram_addr=CRRamData(0x803BE7A7, bit_position=1, ram_byte_size=8)
+   )
 }
 
 LOCATION_TABLE: dict[str, CRLocationData] = {
   **PART_USE,
-  **BATTLE_COUNTER
+  **BATTLE_COUNTER,
+  **CHAPTER_COUNTER
 }
 
 SELF_LOCATIONS_TO_RECV: list[int] = [

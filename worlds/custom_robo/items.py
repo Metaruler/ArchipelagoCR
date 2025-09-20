@@ -13,6 +13,22 @@ class CRItemData(NamedTuple):
   item_id: Optional[int] = None # Unique ID for item
   update_ram_addr: Optional[list[CRRamData]] = None
 
+class CRItem(Item):
+  game: str = "Custom Robo"
+  doorid: Optional[int] = None
+
+  def __init__(self, name: str, player: int, data: CRItemData, force_nonprogress: bool = False):
+      adjusted_classification = IC.filler if force_nonprogress else data.classification
+      super(CRItem, self).__init__(name, adjusted_classification, CRItem.get_apid(data.code), player)
+
+      self.type = data.type
+      self.item_id = data.code
+
+  @staticmethod
+  def get_apid(code: int):
+      base_id: int = 8000
+      return base_id + code if code is not None else None
+
 # Begin item list for AP
 # Scenario progression gates needed to move to next chapter
 PROGRESSION_SCENARIO_TABLE: dict[str, CRItemData] = {
@@ -1308,8 +1324,18 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
   ]
 }
 
+FILLER_ITEMS: dict[str, CRItemData] = {
+   CRItemData(
+      name="Robo Cube",
+      type="Filler Item",
+      code=205,
+      classification=IC.filler,
+   )
+}
+
 ALL_ITEMS_TABLE = {
-  **PROGRESSION_SCENARIO_TABLE,
+#  **PROGRESSION_SCENARIO_TABLE,
   **PARTS_ITEM_TABLE,
-  **PROGRESSION_RAHU
+  **PROGRESSION_RAHU,
+  **FILLER_ITEMS
 }
