@@ -3,7 +3,7 @@ from typing import ClassVar
 import random
 
 # AP Related Imports
-from BaseClasses import Item, Region
+from BaseClasses import Item, Region, Location
 from worlds.AutoWorld import WebWorld, World
 
 # Relative Imports
@@ -30,7 +30,7 @@ class CRWorld(World):
         name: CRItem.get_apid(data.code) for name, data in ALL_ITEMS_TABLE.items()
     }
     location_name_to_id: ClassVar[dict[str, int]] = {
-        name: CRLocation.get_apid(data.code) for name, data in LOCATION_TABLE.items()
+        name: data.code for name, data in LOCATION_TABLE.items()
     }
     data_version = 1
     web = CRWeb()
@@ -44,10 +44,21 @@ class CRWorld(World):
 
     def create_regions(self):
         # Add all randomizable regions
-        region_data = {}
+        region_data = {"Default": ""}
 
         menu_region = Region("Menu", self.player, self.multiworld)
+
+        for location_name, location_data in LOCATION_TABLE.items():
+#            region=self.multiworld.get_region("Menu", self.player)
+            location = Location(
+                self.player,
+                location_name,
+                location_data.code,
+                menu_region
+            )
+            menu_region.locations.append(location)
         self.multiworld.regions.append(menu_region)
+            
 
     def create_items(self):
         item_pool = []

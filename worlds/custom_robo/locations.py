@@ -8,29 +8,6 @@ class CRLocationData(NamedTuple):
   ram_addr: Optional[CRRamData] = None
   illegal: bool = False
 
-class CRLocation(Location):
-  game: str = "Custom Robo"
-  access: list[str]
-  rule_def: str = ""
-  locked_item: Optional[str]
-
-  def __init__(self, player: int, name: str, parent: Region, data: CRLocationData):
-      address = None if data.code is None else CRLocation.get_apid(data.code)
-      super(CRLocation, self).__init__(player, name, address=address, parent=parent)
-
-      self.code = data.code
-      self.region = data.region
-      self.type = data.type
-      self.jmpentry = data.jmpentry
-      self.address = self.address
-      self.access = data.access
-      self.locked_item = data.locked_item
-
-  @staticmethod
-  def get_apid(code: int):
-      base_id: int = 8000
-      return base_id + code if code is not None else None
-
 # Begin check logic
 # Check for each part being used in a victory
 PART_USE: dict[str, CRLocationData] = {
