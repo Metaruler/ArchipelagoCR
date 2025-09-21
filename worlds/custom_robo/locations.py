@@ -1,6 +1,6 @@
 #Checks
 from typing import NamedTuple, Optional
-from .Helpers import CRRamData
+from .helpers import CRRamData
 from BaseClasses import Location, Region
 
 class CRLocationData(NamedTuple):
@@ -29,7 +29,7 @@ class CRLocation(Location):
   @staticmethod
   def get_apid(code: int):
       base_id: int = 8000
-      return base_id + code
+      return base_id + code if code is not None else None
 
 # Begin check logic
 # Check for each part being used in a victory
@@ -820,7 +820,6 @@ PART_USE: dict[str, CRLocationData] = {
 # Each battle counts as a check
 BATTLE_COUNTER: dict[str, CRLocationData] = {
   "Battles Won": CRLocationData(
-    name="Battles",
     code=187,
     ram_addr=CRRamData(0x803BF9C9, bit_position=1, ram_byte_size=8)
   )
@@ -828,7 +827,6 @@ BATTLE_COUNTER: dict[str, CRLocationData] = {
 
 CHAPTER_COUNTER: dict[str, CRLocationData] = {
    "Current Chapter": CRLocationData(
-      name="Chapters",
       code=None,
       ram_addr=CRRamData(0x803BE7A7, bit_position=1, ram_byte_size=8)
    )
@@ -840,5 +838,5 @@ LOCATION_TABLE: dict[str, CRLocationData] = {
   **CHAPTER_COUNTER
 }
 
-SELF_LOCATIONS_TO_RECV: list[int] = [
-    CRLocation.get_apid(value.code) for value in LOCATION_TABLE.values() if value.remote_only]
+#SELF_LOCATIONS_TO_RECV: list[int] = [
+#    CRLocation.get_apid(value.code) for value in LOCATION_TABLE.values() if value.remote_only]

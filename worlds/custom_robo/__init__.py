@@ -27,10 +27,10 @@ class CRWorld(World):
 
     topology_present = False
     item_name_to_id: ClassVar[dict[str, int]] = {
-        name: CRItem.get_apid(data.code) for name, data in ALL_ITEMS_TABLE.items() if data.code is not None
+        name: CRItem.get_apid(data.code) for name, data in ALL_ITEMS_TABLE.items()
     }
     location_name_to_id: ClassVar[dict[str, int]] = {
-        name: CRLocation.get_apid(data.code) for name, data in LOCATION_TABLE.items() if data.code is not None
+        name: CRLocation.get_apid(data.code) for name, data in LOCATION_TABLE.items()
     }
     data_version = 1
     web = CRWeb()

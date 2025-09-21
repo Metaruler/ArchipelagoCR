@@ -6,16 +6,16 @@ from .helpers import CRRamData
 
 # Item Class
 class CRItemData(NamedTuple):
-  name: Optional[str] = None
   type: str
   code: Optional[int]
   classification: IC
+  name: Optional[str] = None
   item_id: Optional[int] = None # Unique ID for item
   update_ram_addr: Optional[list[CRRamData]] = None
 
 class CRItem(Item):
   game: str = "Custom Robo"
-  doorid: Optional[int] = None
+# doorid: Optional[int] = None
 
   def __init__(self, name: str, player: int, data: CRItemData, force_nonprogress: bool = False):
       adjusted_classification = IC.filler if force_nonprogress else data.classification
@@ -1325,7 +1325,7 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
 }
 
 FILLER_ITEMS: dict[str, CRItemData] = {
-   CRItemData(
+   "Robo Cube": CRItemData(
       name="Robo Cube",
       type="Filler Item",
       code=205,
@@ -1334,8 +1334,8 @@ FILLER_ITEMS: dict[str, CRItemData] = {
 }
 
 ALL_ITEMS_TABLE = {
-#  **PROGRESSION_SCENARIO_TABLE,
+# **PROGRESSION_SCENARIO_TABLE,
   **PARTS_ITEM_TABLE,
-  **PROGRESSION_RAHU,
+  **{item.name: item for item_list in PROGRESSION_RAHU.values() for item in item_list},
   **FILLER_ITEMS
 }
