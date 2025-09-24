@@ -12,6 +12,7 @@ class CRItemData(NamedTuple):
   name: Optional[str] = None
   item_id: Optional[int] = None # Unique ID for item
   update_ram_addr: Optional[list[CRRamData]] = None
+  illegal: bool = False
 
 class CRItem(Item):
   game: str = "Custom Robo"
@@ -320,10 +321,11 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     update_ram_addr=[CRRamData(0x803BFB9D, bit_position=8)]
   ),
   "Ray Legend": CRItemData(
-    type="Illegal Body",
+    type="Body",
     code=42,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFB9C, bit_position=1)]
+    update_ram_addr=[CRRamData(0x803BFB9C, bit_position=1)],
+    illegal=True
   ),
   "Oil Can": CRItemData(
     type="Body",
@@ -332,28 +334,32 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     update_ram_addr=[CRRamData(0x803BFB9C, bit_position=2)]
   ),
   "Ray Warrior": CRItemData(
-    type="Illegal Body",
+    type="Body",
     code=44,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFB9C, bit_position=3)]
+    update_ram_addr=[CRRamData(0x803BFB9C, bit_position=3)],
+    illegal=True
   ),
   "Rakansen": CRItemData(
-    type="Illegal Body",
+    type="Body",
     code=45,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFB9C, bit_position=4)]
+    update_ram_addr=[CRRamData(0x803BFB9C, bit_position=4)],
+    illegal=True
   ),
   "Ruhiel": CRItemData(
-    type="Illegal Body",
+    type="Body",
     code=46,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFB9C, bit_position=5)]
+    update_ram_addr=[CRRamData(0x803BFB9C, bit_position=5)],
+    illegal=True
   ),
   "Athena": CRItemData(
-    type="Illegal Body",
+    type="Body",
     code=47,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFB9C, bit_position=6)]
+    update_ram_addr=[CRRamData(0x803BFB9C, bit_position=6)],
+    illegal=True
   ),
   "Chickenheart": CRItemData(
     type="Body",
@@ -363,145 +369,145 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
   ),
   
   # Gun Parts
-  "Basic": CRItemData(
+  "Basic Gun": CRItemData(
     type="Gun",
     code=49,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBF, bit_position=1)]
   ),
-  "3-Way": CRItemData(
+  "3-Way Gun": CRItemData(
     type="Gun",
     code=50,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBF, bit_position=2)]
   ),
-  "Gatling": CRItemData(
+  "Gatling Gun": CRItemData(
     type="Gun",
     code=51,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBF, bit_position=3)]
   ),
-  "Vertical": CRItemData(
+  "Vertical Gun": CRItemData(
     type="Gun",
     code=52,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBF, bit_position=4)]
   ),
-  "Sniper": CRItemData(
+  "Sniper Gun": CRItemData(
     type="Gun",
     code=53,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBF, bit_position=5)]
   ),
-  "Stun": CRItemData(
+  "Stun Gun": CRItemData(
     type="Gun",
     code=54,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBF, bit_position=6)]
   ),
-  "Hornet": CRItemData(
+  "Hornet Gun": CRItemData(
     type="Gun",
     code=55,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBF, bit_position=7)]
   ),
-  "Flame": CRItemData(
+  "Flame Gun": CRItemData(
     type="Gun",
     code=56,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBF, bit_position=8)]
   ),
-  "Dragon": CRItemData(
+  "Dragon Gun": CRItemData(
     type="Gun",
     code=57,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBE, bit_position=1)]
   ),
-  "Splash": CRItemData(
+  "Splash Gun": CRItemData(
     type="Gun",
     code=58,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBE, bit_position=2)]
   ),
-  "Left Arc": CRItemData(
+  "Left Arc Gun": CRItemData(
     type="Gun",
     code=59,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBE, bit_position=3)]
   ),
-  "Right Arc": CRItemData(
+  "Right Arc Gun": CRItemData(
     type="Gun",
     code=60,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBE, bit_position=4)]
   ),
-  "Shotgun": CRItemData(
+  "Shotgun Gun": CRItemData(
     type="Gun",
     code=61,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBE, bit_position=5)]
   ),
-  "Rayfall": CRItemData(
+  "Rayfall Gun": CRItemData(
     type="Gun",
     code=62,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBE, bit_position=6)]
   ),
-  "Bubble": CRItemData(
+  "Bubble Gun": CRItemData(
     type="Gun",
     code=63,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBE, bit_position=7)]
   ),
-  "Eagle": CRItemData(
+  "Eagle Gun": CRItemData(
     type="Gun",
     code=64,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBE, bit_position=8)]
   ),
-  "V Laser": CRItemData(
+  "V Laser Gun": CRItemData(
     type="Gun",
     code=65,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBD, bit_position=1)]
   ),
-  "Magnum": CRItemData(
+  "Magnum Gun": CRItemData(
     type="Gun",
     code=66,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBD, bit_position=2)]
   ),
-  "Needle": CRItemData(
+  "Needle Gun": CRItemData(
     type="Gun",
     code=67,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBD, bit_position=3)]
   ),
-  "Starshot": CRItemData(
+  "Starshot Gun": CRItemData(
     type="Gun",
     code=68,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBD, bit_position=4)]
   ),
-  "Glider": CRItemData(
+  "Glider Gun": CRItemData(
     type="Gun",
     code=69,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBD, bit_position=5)]
   ),
-  "Homing Star": CRItemData(
+  "Homing Star Gun": CRItemData(
     type="Gun",
     code=70,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBD, bit_position=6)]
   ),
-  "Trap": CRItemData(
+  "Trap Gun": CRItemData(
     type="Gun",
     code=71,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBD, bit_position=7)]
   ),
-  "Drill": CRItemData(
+  "Drill Gun": CRItemData(
     type="Gun",
     code=72,
     classification=IC.useful,
@@ -513,49 +519,49 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBC, bit_position=1)]
   ),
-  "Claw": CRItemData(
+  "Claw Gun": CRItemData(
     type="Gun",
     code=74,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBC, bit_position=2)]
   ),
-  "Knuckle": CRItemData(
+  "Knuckle Gun": CRItemData(
     type="Gun",
     code=75,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBC, bit_position=3)]
   ),
-  "Afterburner": CRItemData(
+  "Afterburner Gun": CRItemData(
     type="Gun",
     code=76,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBC, bit_position=4)]
   ),
-  "Blade": CRItemData(
+  "Blade Gun": CRItemData(
     type="Gun",
     code=77,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBC, bit_position=5)]
   ),
-  "Meteor Storm": CRItemData(
+  "Meteor Storm Gun": CRItemData(
     type="Gun",
     code=78,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBC, bit_position=6)]
   ),
-  "Twin Fang": CRItemData(
+  "Twin Fang Gun": CRItemData(
     type="Gun",
     code=79,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBC, bit_position=7)]
   ),
-  "Gravity": CRItemData(
+  "Gravity Gun": CRItemData(
     type="Gun",
     code=80,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBBC, bit_position=8)]
   ),
-  "Phoenix": CRItemData(
+  "Phoenix Gun": CRItemData(
     type="Gun",
     code=81,
     classification=IC.useful,
@@ -567,95 +573,102 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBC3, bit_position=2)]
   ),
-  "Left Pulse": CRItemData(
+  "Left Pulse Gun": CRItemData(
     type="Gun",
     code=83,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBC3, bit_position=3)]
   ),
-  "Right Pulse": CRItemData(
+  "Right Pulse Gun": CRItemData(
     type="Gun",
     code=84,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBC3, bit_position=4)]
   ),
-  "Sword Storm": CRItemData(
+  "Sword Storm Gun": CRItemData(
     type="Gun",
     code=85,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBC3, bit_position=5)]
   ),
-  "Ion": CRItemData(
+  "Ion Gun": CRItemData(
     type="Gun",
     code=86,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBC3, bit_position=6)]
   ),
-  "Flare": CRItemData(
+  "Flare Gun": CRItemData(
     type="Gun",
     code=87,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBC3, bit_position=7)]
   ),
-  "Left 5-Way": CRItemData(
+  "Left 5-Way Gun": CRItemData(
     type="Gun",
     code=88,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBC3, bit_position=8)]
   ),
-  "Right 5-Way": CRItemData(
+  "Right 5-Way Gun": CRItemData(
     type="Gun",
     code=89,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBC2, bit_position=1)]
   ),
-  "Halo": CRItemData(
+  "Halo Gun": CRItemData(
     type="Gun",
     code=90,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBC2, bit_position=2)]
   ),
-  "Wave Laser": CRItemData(
-    type="Illegal Gun",
+  "Wave Laser Gun": CRItemData(
+    type="Gun",
     code=91,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFBC2, bit_position=3)]
+    update_ram_addr=[CRRamData(0x803BFBC2, bit_position=3)],
+    illegal=True
   ),
-  "X Laser": CRItemData(
-    type="Illegal Gun",
+  "X Laser Gun": CRItemData(
+    type="Gun",
     code=92,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFBC2, bit_position=4)]
+    update_ram_addr=[CRRamData(0x803BFBC2, bit_position=4)],
+    illegal=True
   ),
-  "Crystal Strike": CRItemData(
-    type="Illegal Gun",
+  "Crystal Strike Gun": CRItemData(
+    type="Gun",
     code=93,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFBC2, bit_position=5)]
+    update_ram_addr=[CRRamData(0x803BFBC2, bit_position=5)],
+    illegal=True
   ),
-  "Wyrm": CRItemData(
-    type="Illegal Gun",
+  "Wyrm Gun": CRItemData(
+    type="Gun",
     code=94,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFBC2, bit_position=6)]
+    update_ram_addr=[CRRamData(0x803BFBC2, bit_position=6)],
+    illegal=True
   ),
-  "Raptor": CRItemData(
-    type="Illegal Gun",
+  "Raptor Gun": CRItemData(
+    type="Gun",
     code=95,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFBC2, bit_position=7)]
+    update_ram_addr=[CRRamData(0x803BFBC2, bit_position=7)],
+    illegal=True
   ),
   "Waxing Arc Gun": CRItemData(
-    type="Illegal Gun",
+    type="Gun",
     code=96,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFBC2, bit_position=8)]
+    update_ram_addr=[CRRamData(0x803BFBC2, bit_position=8)],
+    illegal=True
   ),
   "Waning Arc Gun": CRItemData(
-    type="Illegal Gun",
+    type="Gun",
     code=97,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFBC1, bit_position=1)]
+    update_ram_addr=[CRRamData(0x803BFBC1, bit_position=1)],
+    illegal=True
   ),
   
   # Bomb Parts
@@ -665,13 +678,13 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDF, bit_position=1)]
   ),
-  "Standard F": CRItemData(
+  "Standard F Bomb": CRItemData(
     type="Bomb",
     code=99,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDF, bit_position=2)]
   ),
-  "Standard S": CRItemData(
+  "Standard S Bomb": CRItemData(
     type="Bomb",
     code=100,
     classification=IC.useful,
@@ -683,133 +696,133 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDF, bit_position=4)]
   ),
-  "Straight G": CRItemData(
+  "Straight G Bomb": CRItemData(
     type="Bomb",
     code=102,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDF, bit_position=5)]
   ),
-  "Straight S": CRItemData(
+  "Straight S Bomb": CRItemData(
     type="Bomb",
     code=103,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDF, bit_position=6)]
   ),
-  "Straight T": CRItemData(
+  "Straight T Bomb": CRItemData(
     type="Bomb",
     code=104,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDF, bit_position=7)]
   ),
-  "Right Flank H": CRItemData(
+  "Right Flank H Bomb": CRItemData(
     type="Bomb",
     code=105,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDF, bit_position=8)]
   ),
-  "Left Flank H": CRItemData(
+  "Left Flank H Bomb": CRItemData(
     type="Bomb",
     code=106,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDE, bit_position=1)]
   ),
-  "Right Wave": CRItemData(
+  "Right Wave Bomb": CRItemData(
     type="Bomb",
     code=107,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDE, bit_position=2)]
   ),
-  "Left Wave": CRItemData(
+  "Left Wave Bomb": CRItemData(
     type="Bomb",
     code=108,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDE, bit_position=3)]
   ),
-  "Burrow D": CRItemData(
+  "Burrow D Bomb": CRItemData(
     type="Bomb",
     code=109,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDE, bit_position=4)]
   ),
-  "Burrow P": CRItemData(
+  "Burrow P Bomb": CRItemData(
     type="Bomb",
     code=110,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDE, bit_position=5)]
   ),
-  "Freeze": CRItemData(
+  "Freeze Bomb": CRItemData(
     type="Bomb",
     code=111,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDE, bit_position=6)]
   ),
-  "Tomahawk B": CRItemData(
+  "Tomahawk B Bomb": CRItemData(
     type="Bomb",
     code=112,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDE, bit_position=7)]
   ),
-  "Tomahawk G": CRItemData(
+  "Tomahawk G Bomb": CRItemData(
     type="Bomb",
     code=113,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDE, bit_position=8)]
   ),
-  "Gemini B": CRItemData(
+  "Gemini B Bomb": CRItemData(
     type="Bomb",
     code=114,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDD, bit_position=1)]
   ),
-  "Gemini P": CRItemData(
+  "Gemini P Bomb": CRItemData(
     type="Bomb",
     code=115,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDD, bit_position=2)]
   ),
-  "Submarine D": CRItemData(
+  "Submarine D Bomb": CRItemData(
     type="Bomb",
     code=116,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDD, bit_position=3)]
   ),
-  "Submarine P": CRItemData(
+  "Submarine P Bomb": CRItemData(
     type="Bomb",
     code=117,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDD, bit_position=4)]
   ),
-  "Crescent P": CRItemData(
+  "Crescent P Bomb": CRItemData(
     type="Bomb",
     code=118,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDD, bit_position=5)]
   ),
-  "Crescent C": CRItemData(
+  "Crescent C Bomb": CRItemData(
     type="Bomb",
     code=119,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDD, bit_position=6)]
   ),
-  "Dual": CRItemData(
+  "Dual Bomb": CRItemData(
     type="Bomb",
     code=120,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDD, bit_position=7)]
   ),
-  "Dual C": CRItemData(
+  "Dual C Bomb": CRItemData(
     type="Bomb",
     code=121,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDD, bit_position=8)]
   ),
-  "Acrobat": CRItemData(
+  "Acrobat Bomb": CRItemData(
     type="Bomb",
     code=122,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDC, bit_position=1)]
   ),
-  "Delta": CRItemData(
+  "Delta Bomb": CRItemData(
     type="Bomb",
     code=123,
     classification=IC.useful,
@@ -821,19 +834,19 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDC, bit_position=3)]
   ),
-  "Smash": CRItemData(
+  "Smash Bomb": CRItemData(
     type="Bomb",
     code=125,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDC, bit_position=4)]
   ),
-  "Double Mine": CRItemData(
+  "Double Mine Bomb": CRItemData(
     type="Bomb",
     code=126,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDC, bit_position=5)]
   ),
-  "Geo Trap": CRItemData(
+  "Geo Trap Bomb": CRItemData(
     type="Bomb",
     code=127,
     classification=IC.useful,
@@ -851,53 +864,57 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBDC, bit_position=8)]
   ),
-  "Standard K": CRItemData(
+  "Standard K Bomb": CRItemData(
     type="Bomb",
     code=130,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBE3, bit_position=1)]
   ),
-  "Submarine K": CRItemData(
+  "Submarine K Bomb": CRItemData(
     type="Bomb",
     code=131,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBE3, bit_position=2)]
   ),
-  "Crescent K": CRItemData(
+  "Crescent K Bomb": CRItemData(
     type="Bomb",
     code=132,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBE3, bit_position=3)]
   ),
-  "Standard X": CRItemData(
+  "Standard X Bomb": CRItemData(
     type="Bomb",
     code=133,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBE3, bit_position=4)]
   ),
-  "Treble": CRItemData(
+  "Treble Bomb": CRItemData(
     type="Bomb",
     code=134,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFBE3, bit_position=5)]
+    update_ram_addr=[CRRamData(0x803BFBE3, bit_position=5)],
+    illegal=True
   ),
-  "Wyvern": CRItemData(
+  "Wyvern Bomb": CRItemData(
     type="Bomb",
     code=135,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFBE3, bit_position=6)]
+    update_ram_addr=[CRRamData(0x803BFBE3, bit_position=6)],
+    illegal=True
   ),
   "Waxing Arc Bomb": CRItemData(
     type="Bomb",
     code=136,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFBE3, bit_position=7)]
+    update_ram_addr=[CRRamData(0x803BFBE3, bit_position=7)],
+    illegal=True
   ),
   "Waning Arc Bomb": CRItemData(
     type="Bomb",
     code=137,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFBE3, bit_position=8)]
+    update_ram_addr=[CRRamData(0x803BFBE3, bit_position=8)],
+    illegal=True
   ),
 
   #Pod Parts
@@ -907,109 +924,109 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFF, bit_position=1)]
   ),
-  "Seeker F": CRItemData(
+  "Seeker F Pod": CRItemData(
     type="Pod",
     code=139,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFF, bit_position=2)]
   ),
-  "Seeker G": CRItemData(
+  "Seeker G Pod": CRItemData(
     type="Pod",
     code=140,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFF, bit_position=3)]
   ),
-  "Speed D": CRItemData(
+  "Speed D Pod": CRItemData(
     type="Pod",
     code=141,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFF, bit_position=4)]
   ),
-  "Speed P": CRItemData(
+  "Speed P Pod": CRItemData(
     type="Pod",
     code=142,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFF, bit_position=5)]
   ),
-  "Cockroach G": CRItemData(
+  "Cockroach G Pod": CRItemData(
     type="Pod",
     code=143,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFF, bit_position=6)]
   ),
-  "Cockroach H": CRItemData(
+  "Cockroach H Pod": CRItemData(
     type="Pod",
     code=144,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFF, bit_position=7)]
   ),
-  "Dolphin": CRItemData(
+  "Dolphin Pod": CRItemData(
     type="Pod",
     code=145,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFF, bit_position=8)]
   ),
-  "Dolphin G": CRItemData(
+  "Dolphin G Pod": CRItemData(
     type="Pod",
     code=146,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFE, bit_position=1)]
   ),
-  "Spider": CRItemData(
+  "Spider Pod": CRItemData(
     type="Pod",
     code=147,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFE, bit_position=2)]
   ),
-  "Spider G": CRItemData(
+  "Spider G Pod": CRItemData(
     type="Pod",
     code=148,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFE, bit_position=3)]
   ),
-  "Sky Freeze": CRItemData(
+  "Sky Freeze Pod": CRItemData(
     type="Pod",
     code=149,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFE, bit_position=4)]
   ),
-  "Ground Freeze": CRItemData(
+  "Ground Freeze Pod": CRItemData(
     type="Pod",
     code=150,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFE, bit_position=5)]
   ),
-  "Feint F": CRItemData(
+  "Feint F Pod": CRItemData(
     type="Pod",
     code=151,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFE, bit_position=6)]
   ),
-  "Feint G": CRItemData(
+  "Feint G Pod": CRItemData(
     type="Pod",
     code=152,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFE, bit_position=7)]
   ),
-  "Float F": CRItemData(
+  "Float F Pod": CRItemData(
     type="Pod",
     code=153,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFE, bit_position=8)]
   ),
-  "Jumping B": CRItemData(
+  "Jumping B Pod": CRItemData(
     type="Pod",
     code=154,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFD, bit_position=1)]
   ),
-  "Jumping G": CRItemData(
+  "Jumping G Pod": CRItemData(
     type="Pod",
     code=155,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFD, bit_position=2)]
   ),
-  "Diving": CRItemData(
+  "Diving Pod": CRItemData(
     type="Pod",
     code=156,
     classification=IC.useful,
@@ -1021,25 +1038,25 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFD, bit_position=4)]
   ),
-  "Satellite": CRItemData(
+  "Satellite Pod": CRItemData(
     type="Pod",
     code=158,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFD, bit_position=5)]
   ),
-  "Satellite H": CRItemData(
+  "Satellite H Pod": CRItemData(
     type="Pod",
     code=159,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFD, bit_position=6)]
   ),
-  "Beast F": CRItemData(
+  "Beast F Pod": CRItemData(
     type="Pod",
     code=160,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFD, bit_position=7)]
   ),
-  "Trio H": CRItemData(
+  "Trio H Pod": CRItemData(
     type="Pod",
     code=161,
     classification=IC.useful,
@@ -1051,55 +1068,55 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFC, bit_position=1)]
   ),
-  "Reflection": CRItemData(
+  "Reflection Pod": CRItemData(
     type="Pod",
     code=163,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFC, bit_position=2)]
   ),
-  "Caboose C": CRItemData(
+  "Caboose C Pod": CRItemData(
     type="Pod",
     code=164,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFC, bit_position=3)]
   ),
-  "Caboose T": CRItemData(
+  "Caboose T Pod": CRItemData(
     type="Pod",
     code=165,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFC, bit_position=4)]
   ),
-  "Twin Flank F": CRItemData(
+  "Twin Flank F Pod": CRItemData(
     type="Pod",
     code=166,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFC, bit_position=5)]
   ),
-  "Twin Flank G": CRItemData(
+  "Twin Flank G Pod": CRItemData(
     type="Pod",
     code=167,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFC, bit_position=6)]
   ),
-  "Umbrella": CRItemData(
+  "Umbrella Pod": CRItemData(
     type="Pod",
     code=168,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFC, bit_position=7)]
   ),
-  "Throwing D": CRItemData(
+  "Throwing D Pod": CRItemData(
     type="Pod",
     code=169,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFBFC, bit_position=8)]
   ),
-  "Throwing P": CRItemData(
+  "Throwing P Pod": CRItemData(
     type="Pod",
     code=170,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC03, bit_position=1)]
   ),
-  "Double Wave": CRItemData(
+  "Double Wave Pod": CRItemData(
     type="Pod",
     code=171,
     classification=IC.useful,
@@ -1117,127 +1134,133 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC03, bit_position=4)]
   ),
-  "Standard F": CRItemData(
+  "Standard F Pod": CRItemData(
     type="Pod",
     code=174,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC03, bit_position=5)]
   ),
-  "Caboose X": CRItemData(
+  "Caboose X Pod": CRItemData(
     type="Pod",
     code=175,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC03, bit_position=6)]
   ),
-  "Cheetah": CRItemData(
-    type="Illegal Pod",
+  "Cheetah Pod": CRItemData(
+    type="Pod",
     code=176,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFC03, bit_position=7)]
+    update_ram_addr=[CRRamData(0x803BFC03, bit_position=7)],
+    illegal=True
   ),
-  "Wolf Spider": CRItemData(
-    type="Illegal Pod",
+  "Wolf Spider Pod": CRItemData(
+    type="Pod",
     code=177,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFC03, bit_position=8)]
+    update_ram_addr=[CRRamData(0x803BFC03, bit_position=8)],
+    illegal=True
   ),
-  "Orca": CRItemData(
-    type="Illegal Pod",
+  "Orca Pod": CRItemData(
+    type="Pod",
     code=178,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFC02, bit_position=1)]
+    update_ram_addr=[CRRamData(0x803BFC02, bit_position=1)],
+    illegal=True
   ),
 
   # Leg Parts
-  "Standard Leg": CRItemData(
-    type="Leg",
+  "Standard Legs": CRItemData(
+    type="Legs",
     code=179,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC1F, bit_position=1)]
   ),
-  "High Jump": CRItemData(
-    type="Leg",
+  "High Jump Legs": CRItemData(
+    type="Legs",
     code=180,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC1F, bit_position=2)]
   ),
-  "Ground": CRItemData(
-    type="Leg",
+  "Ground Legs": CRItemData(
+    type="Legs",
     code=181,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC1F, bit_position=3)]
   ),
-  "Formula": CRItemData(
-    type="Leg",
+  "Formula Legs": CRItemData(
+    type="Legs",
     code=182,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC1F, bit_position=4)]
   ),
-  "Stabilizer": CRItemData(
-    type="Leg",
+  "Stabilizer Legs": CRItemData(
+    type="Legs",
     code=183,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC1F, bit_position=5)]
   ),
-  "Short Thrust": CRItemData(
-    type="Leg",
+  "Short Thrust Legs": CRItemData(
+    type="Legs",
     code=184,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC1F, bit_position=6)]
   ),
-  "Long Thrust": CRItemData(
-    type="Leg",
+  "Long Thrust Legs": CRItemData(
+    type="Legs",
     code=185,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC1F, bit_position=7)]
   ),
-  "Quick Jump": CRItemData(
-    type="Leg",
+  "Quick Jump Legs": CRItemData(
+    type="Legs",
     code=186,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC1F, bit_position=8)]
   ),
-  "Feather": CRItemData(
-    type="Leg",
+  "Feather Legs": CRItemData(
+    type="Legs",
     code=187,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC1E, bit_position=1)]
   ),
-  "Wide Jump": CRItemData(
-    type="Leg",
+  "Wide Jump Legs": CRItemData(
+    type="Legs",
     code=188,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC1E, bit_position=2)]
   ),
-  "Can Leg": CRItemData(
-    type="Leg",
+  "Can Legs": CRItemData(
+    type="Legs",
     code=189,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC1E, bit_position=3)]
   ),
-  "Booster": CRItemData(
-    type="Leg",
+  "Booster Legs": CRItemData(
+    type="Legs",
     code=190,
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC1E, bit_position=4)]
   ),
-  "Swallow": CRItemData(
-    type="Illegal Leg",
+  "Swallow Legs": CRItemData(
+    type="Legs",
     code=191,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFC1E, bit_position=5)]
+    update_ram_addr=[CRRamData(0x803BFC1E, bit_position=5)],
+    illegal=True
   ),
-  "Raven": CRItemData(
-    type="Illegal Leg",
+  "Raven Legs": CRItemData(
+    type="Legs",
     code=192,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFC1E, bit_position=6)]
+    update_ram_addr=[CRRamData(0x803BFC1E, bit_position=6)],
+    illegal=True
   ),
-  "Eclipse": CRItemData(
-    type="Illegal Leg",
+  "Eclipse Legs": CRItemData(
+    type="Legs",
     code=193,
     classification=IC.useful,
-    update_ram_addr=[CRRamData(0x803BFC1E, bit_position=7)]
+    update_ram_addr=[CRRamData(0x803BFC1E, bit_position=7)],
+    illegal=True
   )
 }
 
@@ -1249,77 +1272,88 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
       type="Rahu Part",
       code=194,
       classification=IC.useful,
-      update_ram_addr=[CRRamData(0x803BFB9C, bit_position=7)]
+      update_ram_addr=[CRRamData(0x803BFB9C, bit_position=7)],
+      illegal=True
     ),
     CRItemData(
       name="Penumbra I Pod",
       type="Rahu Part",
       code=195,
       classification=IC.useful,
-      update_ram_addr=[CRRamData(0x803BFC02, bit_position=2)]
+      update_ram_addr=[CRRamData(0x803BFC02, bit_position=2)],
+      illegal=True
     ),
     CRItemData(
       name="Rahu I Gun",
       type="Rahu Part",
       code=196,
       classification=IC.useful,
-      update_ram_addr=[CRRamData(0x803BFBC1, bit_position=2)]
+      update_ram_addr=[CRRamData(0x803BFBC1, bit_position=2)],
+      illegal=True
     ),
     CRItemData(
       name="Rahu II",
       type="Rahu Part",
       code=197,
       classification=IC.useful,
-      update_ram_addr=[CRRamData(0x803BFB9C, bit_position=8)]
+      update_ram_addr=[CRRamData(0x803BFB9C, bit_position=8)],
+      illegal=True
     ),
     CRItemData(
       name="Penumbra II Pod",
       type="Rahu Part",
       code=198,
       classification=IC.useful,
-      update_ram_addr=[CRRamData(0x803BFC02, bit_position=3)]
+      update_ram_addr=[CRRamData(0x803BFC02, bit_position=3)],
+      illegal=True
     ),
     CRItemData(
       name="Rahu II Gun",
       type="Rahu Part",
       code=199,
       classification=IC.useful,
-      update_ram_addr=[CRRamData(0x803BFBC1, bit_position=3)]
+      update_ram_addr=[CRRamData(0x803BFBC1, bit_position=3)],
+      illegal=True
     ),
     CRItemData(
       name="Grand Cross Bomb",
       type="Rahu Part",
       code=200,
       classification=IC.useful,
-      update_ram_addr=[CRRamData(0x803BFBE2, bit_position=1)]
+      update_ram_addr=[CRRamData(0x803BFBE2, bit_position=1)],
+      illegal=True
     ),
     CRItemData(
       name="Ultimate Legs",
       type="Rahu Part",
       code=201,
       classification=IC.useful,
-      update_ram_addr=[CRRamData(0x803BFC1E, bit_position=1)]
+      update_ram_addr=[CRRamData(0x803BFC1E, bit_position=1)],
+      illegal=True
     ),
     CRItemData(
       name="Rahu III",
       type="Rahu Part",
       code=202,
       classification=IC.useful,
-      update_ram_addr=[CRRamData(0x803BFBA3, bit_position=1)]
+      update_ram_addr=[CRRamData(0x803BFBA3, bit_position=1)],
+      illegal=True
     ),
     CRItemData(
       name="Penumbra III Pod",
       type="Rahu Part",
       code=203,
       classification=IC.useful,
-      update_ram_addr=[CRRamData(0x803BFC02, bit_position=4)]
+      update_ram_addr=[CRRamData(0x803BFC02, bit_position=4)],
+      illegal=True
     ),
     CRItemData(
       name="Rahu III Gun",
       type="Rahu Part",
       code=204,
       classification=IC.useful,
-      update_ram_addr=[CRRamData(0x803BFBC1, bit_position=4)]
+      update_ram_addr=[CRRamData(0x803BFBC1, bit_position=4)],
+      illegal=True
     ),
   ]
 }

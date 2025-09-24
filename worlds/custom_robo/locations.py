@@ -203,7 +203,7 @@ PART_USE: dict[str, CRLocationData] = {
     code=46,
     ram_addr=CRRamData(0x803BFBC6, bit_position=4)
   ),
-  "Use Shotgun": CRLocationData(
+  "Use Shotgun Gun": CRLocationData(
     code=47,
     ram_addr=CRRamData(0x803BFBC6, bit_position=5)
   ),
@@ -550,7 +550,7 @@ PART_USE: dict[str, CRLocationData] = {
     code=128,
     ram_addr=CRRamData(0x803BFC07, bit_position=2)
   ),
-  "Use Standard G Pod": CRLocationData(
+  "Use Seeker G Pod": CRLocationData(
     code=129,
     ram_addr=CRRamData(0x803BFC07, bit_position=3)
   ),
@@ -724,70 +724,70 @@ PART_USE: dict[str, CRLocationData] = {
     ram_addr=CRRamData(0x803BFC0A, bit_position=4),
     illegal=True
   ),
-  "Use Standard Leg": CRLocationData(
+  "Use Standard Legs": CRLocationData(
     code=171,
     ram_addr=CRRamData(0x803BFC27, bit_position=1)
   ),
-  "Use High Jump Leg": CRLocationData(
+  "Use High Jump Legs": CRLocationData(
     code=172,
     ram_addr=CRRamData(0x803BFC27, bit_position=2)
   ),
-  "Use Ground Leg": CRLocationData(
+  "Use Ground Legs": CRLocationData(
     code=173,
     ram_addr=CRRamData(0x803BFC27, bit_position=3)
   ),
-  "Use Formula Leg": CRLocationData(
+  "Use Formula Legs": CRLocationData(
     code=174,
     ram_addr=CRRamData(0x803BFC27, bit_position=4)
   ),
-  "Use Stabilizer Leg": CRLocationData(
+  "Use Stabilizer Legs": CRLocationData(
     code=175,
     ram_addr=CRRamData(0x803BFC27, bit_position=5)
   ),
-  "Use Short Thrust Leg": CRLocationData(
+  "Use Short Thrust Legs": CRLocationData(
     code=176,
     ram_addr=CRRamData(0x803BFC27, bit_position=6)
   ),
-  "Use Long Thrust Leg": CRLocationData(
+  "Use Long Thrust Legs": CRLocationData(
     code=177,
     ram_addr=CRRamData(0x803BFC27, bit_position=7)
   ),
-  "Use Quick Jump Leg": CRLocationData(
+  "Use Quick Jump Legs": CRLocationData(
     code=178,
     ram_addr=CRRamData(0x803BFC27, bit_position=8)
   ),
-  "Use Feather Leg": CRLocationData(
+  "Use Feather Legs": CRLocationData(
     code=179,
     ram_addr=CRRamData(0x803BFC26, bit_position=1)
   ),
-  "Use Wide Jump Leg": CRLocationData(
+  "Use Wide Jump Legs": CRLocationData(
     code=180,
     ram_addr=CRRamData(0x803BFC26, bit_position=2)
   ),
-  "Use Can Leg": CRLocationData(
+  "Use Can Legs": CRLocationData(
     code=181,
     ram_addr=CRRamData(0x803BFC26, bit_position=3)
   ),
-  "Use Booster Leg": CRLocationData(
+  "Use Booster Legs": CRLocationData(
     code=182,
     ram_addr=CRRamData(0x803BFC26, bit_position=4)
   ),
-  "Use Swallow Leg": CRLocationData(
+  "Use Swallow Legs": CRLocationData(
     code=183,
     ram_addr=CRRamData(0x803BFC26, bit_position=5),
     illegal=True
   ),
-  "Use Raven Leg": CRLocationData(
+  "Use Raven Legs": CRLocationData(
     code=184,
     ram_addr=CRRamData(0x803BFC26, bit_position=6),
     illegal=True
   ),
-  "Use Eclipse Leg": CRLocationData(
+  "Use Eclipse Legs": CRLocationData(
     code=185,
     ram_addr=CRRamData(0x803BFC26, bit_position=7),
     illegal=True
   ),
-  "Use Ultimate Leg": CRLocationData(
+  "Use Ultimate Legs": CRLocationData(
     code=186,
     ram_addr=CRRamData(0x803BFC26, bit_position=8),
     illegal=True
@@ -795,15 +795,22 @@ PART_USE: dict[str, CRLocationData] = {
 }
 
 # Each battle counts as a check
-BATTLE_COUNTER: dict[str, CRLocationData] = {
-  "Battles Won": CRLocationData(
-    code=187,
-    ram_addr=CRRamData(0x803BF9C9, bit_position=1, ram_byte_size=8)
-  )
-}
+#BATTLE_COUNTER: dict[str, CRLocationData] = {
+#  "Battles Won": CRLocationData(
+#    code=None,
+#    ram_addr=CRRamData(0x803BF9C9, bit_position=1, ram_byte_size=8)
+#  )
+#}
 
-CHAPTER_COUNTER: dict[str, CRLocationData] = {
-   "Current Chapter": CRLocationData(
+#CHAPTER_COUNTER: dict[str, CRLocationData] = {
+#   "Current Chapter": CRLocationData(
+#      code=None,
+#      ram_addr=CRRamData(0x803BE7A7, bit_position=1, ram_byte_size=8)
+#   )
+#}
+
+RAHU_DEFEATED: dict[str, CRLocationData] = {
+   "Rahu III Defeated": CRLocationData(
       code=None,
       ram_addr=CRRamData(0x803BE7A7, bit_position=1, ram_byte_size=8)
    )
@@ -811,8 +818,9 @@ CHAPTER_COUNTER: dict[str, CRLocationData] = {
 
 LOCATION_TABLE: dict[str, CRLocationData] = {
   **PART_USE,
-  **BATTLE_COUNTER,
-  **CHAPTER_COUNTER
+#  **BATTLE_COUNTER,
+#  **CHAPTER_COUNTER,
+  **RAHU_DEFEATED
 }
 
 #SELF_LOCATIONS_TO_RECV: list[int] = [

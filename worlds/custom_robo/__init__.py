@@ -9,7 +9,7 @@ from worlds.AutoWorld import WebWorld, World
 # Relative Imports
 from .helpers import *
 from .items import ALL_ITEMS_TABLE, CRItem, FILLER_ITEMS
-from .locations import LOCATION_TABLE, CHAPTER_COUNTER
+from .locations import LOCATION_TABLE, RAHU_DEFEATED
 from .options import *
 from .rules import *
 
@@ -61,10 +61,17 @@ class CRWorld(World):
             
 
     def create_items(self):
+        starting_parts = []
         item_pool = []
         for item_name, item_data in ALL_ITEMS_TABLE.items():
-            item_pool.append(self.create_item(item_name))
+            if item_name == "Ray 01" or item_name == "Basic Gun" or item_name == "Standard Bomb" or item_name == "Standard Pod" or item_name == "Standard Legs":
+                starting_parts.append(self.create_item(item_name))
+            else: 
+                item_pool.append(self.create_item(item_name))
 
+        # Pre-collect all starting parts, then send the rest to the multiworld
+        for initial_part in starting_parts:
+            self.multiworld.push_precollected(initial_part)
         self.multiworld.itempool.extend(item_pool)
 
         location_count = len(self.multiworld.get_locations())
@@ -79,12 +86,12 @@ class CRWorld(World):
     def create_item(self, name: str) -> Item:
         item_data = ALL_ITEMS_TABLE[name]
         return Item(name, item_data.classification, item_data.code, self.player)
-    
-#    def set_rules(self):
-#        set_rules(self)
+
+    def set_rules(self):
+        set_rules(self)
 
     def set_completion_rules(self):
-        self.multiworld.completion_condition[self.player] = (CHAPTER_COUNTER == 18)
+        self.multiworld.completion_condition[self.player] = (RAHU_DEFEATED == 18)
 
     def fill_slot_data(self):
         try:
