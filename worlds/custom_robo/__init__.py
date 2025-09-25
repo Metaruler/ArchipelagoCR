@@ -1,6 +1,7 @@
 # Python related Imports
 from typing import ClassVar
 import random
+import os
 
 # AP Related Imports
 from BaseClasses import Item, Region, Location
@@ -12,6 +13,7 @@ from .items import ALL_ITEMS_TABLE, CRItem, FILLER_ITEMS
 from .locations import LOCATION_TABLE, RAHU_DEFEATED
 from .options import *
 from .rules import *
+from .cr_rom import CRPlayerContainer
 
 class CRWeb(WebWorld):
     theme = "stone"
@@ -103,3 +105,20 @@ class CRWorld(World):
                 "total_locations": len(LOCATION_TABLE)
             }
         return slot_data
+    
+        # Output options, locations and doors for patcher
+    def generate_output(self, output_directory: str):
+        # Output seed name and slot number to seed RNG in randomizer client
+        output_data = {
+            "Seed": self.multiworld.seed,
+            "Slot": self.player,
+            "Name": self.player_name,
+        }
+        # Outputs the plando details to our expected output file
+        # Create the output path based on the current player + expected patch file ending.
+        patch_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}"
+            f"{CRPlayerContainer.patch_file_ending}")
+        # Create a zip (container) that will contain all the necessary output files for us to use during patching.
+        lm_container = CRPlayerContainer(output_data, patch_path, self.multiworld.player_name[self.player], self.player)
+        # Write the expected output zip container to the Generated Seed folder.
+        lm_container.write()

@@ -221,6 +221,7 @@ async def _async_main():
     This is the main function that will be called by the `CommonClient`
     to start our client.
     """
+    print("Entering async main")
     parser = get_base_parser(ctx_defaults={"game": "Custom Robo"})
     args = parser.parse_args()
 
@@ -228,10 +229,16 @@ async def _async_main():
     ctx = CRContext(args.connect, args.password)
     ctx.command_processor = CRCommandProcessor(ctx)
 
+    print("Command processor active")
+
     # Run the client!
     ctx.run_gui = gui_enabled
 
+    print("GUI enabled")
+
     await dolphin_connect_loop(ctx)
+
+    print("Dolphin connection complete")
     
     await server_loop(ctx, game_watcher, "Game")
 
