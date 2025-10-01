@@ -6,11 +6,11 @@ import os
 # AP Related Imports
 from BaseClasses import Item, Region, Location
 from worlds.AutoWorld import WebWorld, World
-from worlds.LauncherComponents import launch_subprocess, Component, components, Type
+from worlds.LauncherComponents import launch_subprocess, Component, components, Type, SuffixIdentifier
 
 # Relative Imports
 from .helpers import *
-from .items import ALL_ITEMS_TABLE, CRItem, FILLER_ITEMS
+from .items import ALL_ITEMS_TABLE, CRItem, FILLER_ITEMS, COMPLETION_CONDITIONS
 from .locations import CRLocation, LOCATION_TABLE, RAHU_DEFEATED
 from .options import *
 from .rules import *
@@ -27,7 +27,7 @@ components.append(
               description="Client to interface with Custom Robo AP",
               func=run_client,
               component_type=Type.CLIENT,
-              file_identifier=".apcr")
+              file_identifier=SuffixIdentifier(".apcr"))
 )
 
 class CRWeb(WebWorld):
@@ -54,13 +54,6 @@ class CRWorld(World):
 
     def __init__(self, *args, **kwargs):
         super(CRWorld, self).__init__(*args, **kwargs)
-
-    item_name_to_id: ClassVar[dict[str, int]] = {
-        name: CRItem.get_apid(data.code) for name, data in ALL_ITEMS_TABLE.items() if data.code is not None
-    }
-    location_name_to_id: ClassVar[dict[str, int]] = {
-        name: CRLocation.get_apid(data.code) for name, data in LOCATION_TABLE.items() if data.code is not None
-    }
 
     @staticmethod
     def interpret_slot_data(slot_data):
@@ -98,7 +91,7 @@ class CRWorld(World):
             self.multiworld.push_precollected(initial_part)
         self.multiworld.itempool.extend(item_pool)
 
-        location_count = len(self.multiworld.get_locations())
+        location_count = len(self.multiworld.get_unfilled_locations(self.player))
         items_in_pool = len(self.multiworld.itempool)
         filler_needed = location_count - items_in_pool
 
@@ -106,6 +99,9 @@ class CRWorld(World):
 
         for filler_item_name in filler_items_to_add:
             self.multiworld.itempool.append(self.create_item(filler_item_name))
+
+        # Set completion condition up with item drop
+        # self.multiworld.get_location("Rahu III Defeated", self.player).item = COMPLETION_CONDITIONS.get("Defeat Rahu III")
 
     def create_item(self, name: str) -> Item:
         item_data = ALL_ITEMS_TABLE[name]
@@ -115,7 +111,7 @@ class CRWorld(World):
         set_rules(self)
 
     def set_completion_rules(self):
-        self.multiworld.completion_condition[self.player] = (RAHU_DEFEATED == 18)
+        self.multiworld.completion_condition[self.player] = lambda state: state.has("Defeat Rahu III", self.player)
 
     def fill_slot_data(self):
         try:

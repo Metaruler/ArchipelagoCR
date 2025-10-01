@@ -1367,6 +1367,15 @@ FILLER_ITEMS: dict[str, CRItemData] = {
    )
 }
 
+COMPLETION_CONDITIONS: dict[str, CRItemData] = {
+    "Defeat Rahu III": CRItemData(
+        name="Defeat Rahu III",
+        type="Completion Item",
+        code=None,
+        classification=IC.progression
+    )
+}
+
 ALL_ITEMS_TABLE = {
 # **PROGRESSION_SCENARIO_TABLE,
   **PARTS_ITEM_TABLE,

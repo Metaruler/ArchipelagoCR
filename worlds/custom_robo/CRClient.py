@@ -188,6 +188,7 @@ async def game_watcher(ctx: CRContext):
                     # Check if the bit for defeating Redips is set.
                     if boss_defeated_value == 18:
                         print("Final boss defeated! Signaling game completion to the server.")
+
                         await ctx.send_goal()
                         ctx.finished_game = True  # This ends the while loop on the next pass.
             except Exception as e:
