@@ -1,53 +1,58 @@
+# Imports
 import asyncio
-import json
-import struct
-import time
-import traceback
-import typing
 
-import settings
+# AP Imports
+from CommonClient import CommonContext, ClientCommandProcessor, logger, get_base_parser, server_loop, gui_enabled
+from NetUtils import NetworkItem
 
-import Patch
-import Utils
-from CommonClient import ClientCommandProcessor, CommonContext, get_base_parser, gui_enabled, logger, server_loop
+# Local Imports
 import dolphin_memory_engine as dolphin
+from .locations import PART_USE, LOCATION_TABLE
+from .items import ALL_ITEMS_TABLE
 
-from NetUtils import NetworkItem, ClientStatus
-from worlds.custom_robo.locations import LOCATION_TABLE, PART_USE, RAHU_DEFEATED
-from worlds.custom_robo.items import ALL_ITEMS_TABLE
-from . import helpers
 
-from CommonClient import CommonContext
+# Command Processor
+class CRCommandProcessor(ClientCommandProcessor):
+    def __init__(self, ctx: CommonContext, server_address: str = None):
+        if server_address:
+            ctx.server_address = server_address
+        super().__init__(ctx)
 
 #--------------------------------------------------------------------
 #Context for CR
 class CRContext(CommonContext):
-  """
-  This is the context class for the Custom Robo client. 
-  This will inherit from the core class "CommonContext" in AP.
-  This will hold all the game information, state, and functionality to run the client.
-  """
-  def __init__(self, server_address: str = "", settings: dict = {}, *args, **kwargs):
-      super().__init__(server_address, *args, **kwargs)
+    """
+    This is the context class for the Custom Robo client. 
+    This will inherit from the core class "CommonContext" in AP.
+    This will hold all the game information, state, and functionality to run the client.
+    """
+    def __init__(self, server_address: str = "", settings: dict = {}, *args, **kwargs):
+        super().__init__(server_address, *args, **kwargs)
     
-      # We will use this list to store every location already checked.
-      # This also makes sure to not send duplicates!
-      self.checked_locations = set()
+        # Handle various Dolphin connection related tasks
+#        self.instance_id = None
+#        self.dolphin_sync_task: Optional[asyncio.Task[None]] = None
+#        self.dolphin_status = CONNECTION_INITIAL_STATUS
+#        self.item_display_queue: list[NetUtils.NetworkItem] = []
 
-      # We will use this list to hold all items received in the multiworld.
-      # This will be needed to give items to the player! 
-      self.items_received = []
+        # We will use this list to store every location already checked.
+        # This also makes sure to not send duplicates!
+        self.checked_locations = set()
 
-      #This also stores our options from MMXCMOptions, which is determined by player.
-      self.settings = settings
+        # We will use this list to hold all items received in the multiworld.
+        # This will be needed to give items to the player! 
+        self.items_received = []
 
-  def run_gui(self):
-      """
-      Placeholder for GUI
-      """
-      pass
+        #This also stores our options from MMXCMOptions, which is determined by player.
+        self.settings = settings
 
-  async def on_package(self, cmd: str , args: dict): 
+def run_gui(self):
+    """
+    Placeholder for GUI
+    """
+    pass
+
+async def on_package(self, cmd: str , args: dict): 
     """
     This is the method that is called by CommonClient when a package is received from the server.
     """
@@ -57,25 +62,24 @@ class CRContext(CommonContext):
         self.game_running = True
         await self.send_connect()
         print("Successfully connected to the Archipelago server!")
-
     # This checks if the incoming message from AP server is "Received Items"
     elif cmd == "ReceivedItems":
-      # This is the package sent when we get something from a different player.
-      items_to_add = []
-      for item in args["items"]:
-          # This is the format of the item.
-          items_to_add.append(NetworkItem(*item))
+        # This is the package sent when we get something from a different player.
+        items_to_add = []
+        for item in args["items"]:
+            # This is the format of the item.
+            items_to_add.append(NetworkItem(*item))
 
-      # This will check the list of items to give to player before continuing. 
-      if items_to_add:
-          self.items_received.extend(items_to_add)
-          print(f"Received {len(items_to_add)} new item(s) from the MultiWorld.")
-          for item in items_to_add:
-              print(f" - {self.item_id_to_name.get(item.item, 'Unknown Item')} from {self.player_names[item.player]}")
+    # This will check the list of items to give to player before continuing. 
+    if items_to_add:
+        self.items_received.extend(items_to_add)
+        print(f"Received {len(items_to_add)} new item(s) from the MultiWorld.")
+        for item in items_to_add:
+            print(f" - {self.item_id_to_name.get(item.item, 'Unknown Item')} from {self.player_names[item.player]}")
 
-      # Prints messages from the Server, like hints! 
+    # Prints messages from the Server, like hints! 
     elif cmd == "Print":
-          print(args["text"])
+        print(args["text"])
 
 #--------------------------------------------------------------------
 
@@ -90,14 +94,14 @@ async def dolphin_connect_loop(ctx: CommonContext):
                 dolphin.hook()
 
             if dolphin.get_status() == dolphin.Dolphin.DolphinStatus.no_emu or \
-               dolphin.get_status() == dolphin.Dolphin.DolphinStatus.not_running:
+            dolphin.get_status() == dolphin.Dolphin.DolphinStatus.not_running:
                 if dolphin.is_hooked():
                     dolphin.un_hook()
                 print("Dolphin not running. Waiting for emulator...")
                 await asyncio.sleep(5)
                 continue
 
-            game_id = dolphin.read_bytes(0x80000000, 4)
+            game_id = dolphin.read_bytes(0x80000000, 6)
             if game_id.decode("ascii") not in ["GXCE01"]:
                 print("Incorrect game ID. Make sure Custom Robo is running.")
                 if dolphin.is_hooked():
@@ -120,7 +124,7 @@ class CRCommandProcessor(ClientCommandProcessor):
     def __init__(self, ctx: CRContext):
         super().__init__(ctx)
 
-    def _cmd_mmxcm(self, *args):
+    def _cmd_cr(self, *args):
         """
         These are the commands for our CR Client.
         Serving as a place holder until we need custom commands!
@@ -216,32 +220,44 @@ async def game_watcher(ctx: CRContext):
     dolphin.disconnect()
     print("Disconnected from Dolphin.")
 
-async def _async_main():
+def main(*launch_args: str):
     """
     This is the main function that will be called by the `CommonClient`
     to start our client.
     """
-    print("Entering async main")
-    parser = get_base_parser(ctx_defaults={"game": "Custom Robo"})
-    args = parser.parse_args()
-
-    # Create our context and initialize the command processor.
-    ctx = CRContext(args.connect, args.password)
-    ctx.command_processor = CRCommandProcessor(ctx)
-
-    print("Command processor active")
-
-    # Run the client!
-    ctx.run_gui = gui_enabled
-
-    print("GUI enabled")
-
-    await dolphin_connect_loop(ctx)
-
-    print("Dolphin connection complete")
     
-    await server_loop(ctx, game_watcher, "Game")
+    # server_address: str = ""
+    # rom_path: str = ""
+
+    logger.info("Starting Custom Robo Client v0.1")
+
+    parser = get_base_parser(ctx_defaults={"game": "Custom Robo"})
+    parser.add_arguement('apcr_file', default="", type=str, nargs="?", help="Path to an APCR file")
+    args = parser.parse_args(launch_args)
+
+    async def _async_main(connect, password):
+
+        print("Entering async main")
+
+        # Create our context and initialize the command processor.
+        ctx = CRContext(connect, password)
+        ctx.command_processor = CRCommandProcessor(ctx)
+
+        print("Command processor active")
+
+        # Run the client!
+        ctx.run_gui = gui_enabled
+
+        print("GUI enabled")
+
+        await dolphin_connect_loop(ctx)
+
+        print("Dolphin connection complete")
+
+        await server_loop(ctx, game_watcher, "Game")
+
+    asyncio.run(_async_main(args.connect, args.password))
 
 if __name__ == "__main__":
     # This ensures that the script will run the main function when executed.
-    asyncio.run(_async_main())
+    asyncio.run(main())

@@ -6,14 +6,24 @@ import os
 # AP Related Imports
 from BaseClasses import Item, Region, Location
 from worlds.AutoWorld import WebWorld, World
+from worlds.LauncherComponents import launch_subprocess, Component, components
 
 # Relative Imports
 from .helpers import *
 from .items import ALL_ITEMS_TABLE, CRItem, FILLER_ITEMS
-from .locations import LOCATION_TABLE, RAHU_DEFEATED
+from .locations import CRLocation, LOCATION_TABLE, RAHU_DEFEATED
 from .options import *
 from .rules import *
 from .cr_rom import CRPlayerContainer
+
+def run_client(*args):
+    from .CRClient import main
+    launch_subprocess(main, name="CustomRoboClient", args=args)
+
+# Add Client launcher to Archi list
+components.append(
+    Component(display_name="Custom Robo Client", game_name="Custom Robo", description="Client to interface with Custom Robo AP" ,func=run_client)
+)
 
 class CRWeb(WebWorld):
     theme = "stone"
@@ -39,6 +49,13 @@ class CRWorld(World):
 
     def __init__(self, *args, **kwargs):
         super(CRWorld, self).__init__(*args, **kwargs)
+
+    item_name_to_id: ClassVar[dict[str, int]] = {
+        name: CRItem.get_apid(data.code) for name, data in ALL_ITEMS_TABLE.items() if data.code is not None
+    }
+    location_name_to_id: ClassVar[dict[str, int]] = {
+        name: CRLocation.get_apid(data.code) for name, data in LOCATION_TABLE.items() if data.code is not None
+    }
 
     @staticmethod
     def interpret_slot_data(slot_data):
@@ -119,6 +136,6 @@ class CRWorld(World):
         patch_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}"
             f"{CRPlayerContainer.patch_file_ending}")
         # Create a zip (container) that will contain all the necessary output files for us to use during patching.
-        lm_container = CRPlayerContainer(output_data, patch_path, self.multiworld.player_name[self.player], self.player)
+        cr_container = CRPlayerContainer(output_data, patch_path, self.multiworld.player_name[self.player], self.player)
         # Write the expected output zip container to the Generated Seed folder.
-        lm_container.write()
+        cr_container.write()
