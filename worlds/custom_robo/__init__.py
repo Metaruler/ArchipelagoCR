@@ -6,7 +6,7 @@ import os
 # AP Related Imports
 from BaseClasses import Item, Region, Location
 from worlds.AutoWorld import WebWorld, World
-from worlds.LauncherComponents import launch_subprocess, Component, components
+from worlds.LauncherComponents import launch_subprocess, Component, components, Type
 
 # Relative Imports
 from .helpers import *
@@ -22,7 +22,12 @@ def run_client(*args):
 
 # Add Client launcher to Archi list
 components.append(
-    Component(display_name="Custom Robo Client", game_name="Custom Robo", description="Client to interface with Custom Robo AP" ,func=run_client)
+    Component(display_name="Custom Robo Client",
+              game_name="Custom Robo",
+              description="Client to interface with Custom Robo AP",
+              func=run_client,
+              component_type=Type.CLIENT,
+              file_identifier=".apcr")
 )
 
 class CRWeb(WebWorld):
