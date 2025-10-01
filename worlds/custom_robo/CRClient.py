@@ -4,6 +4,7 @@ import asyncio
 # AP Imports
 from CommonClient import CommonContext, ClientCommandProcessor, logger, get_base_parser, server_loop, gui_enabled
 from NetUtils import NetworkItem
+import Utils
 
 # Local Imports
 import dolphin_memory_engine as dolphin
@@ -84,39 +85,39 @@ async def on_package(self, cmd: str , args: dict):
 #--------------------------------------------------------------------
 
 # Starts the full loop and debug messages for connecting to Dolphin.
-async def dolphin_connect_loop(ctx: CommonContext):
+async def dolphin_connect_loop(self):
     """
     Connects to the Dolphin emulator and waits for the correct game to be running.
     """
+    logger.info("Entering Dolphin Connection loop")
     while True:
         try:
             if not dolphin.is_hooked():
                 dolphin.hook()
 
-            if dolphin.get_status() == dolphin.Dolphin.DolphinStatus.no_emu or \
-            dolphin.get_status() == dolphin.Dolphin.DolphinStatus.not_running:
+            if dolphin.get_status() == dolphin.get_status().noEmu or dolphin.get_status() == dolphin.get_status().notRunning:
                 if dolphin.is_hooked():
                     dolphin.un_hook()
-                print("Dolphin not running. Waiting for emulator...")
+                logger.info("Dolphin not running. Waiting for emulator...")
                 await asyncio.sleep(5)
                 continue
 
             game_id = dolphin.read_bytes(0x80000000, 6)
             if game_id.decode("ascii") not in ["GXCE01"]:
-                print("Incorrect game ID. Make sure Custom Robo is running.")
+                logger.info("Incorrect game ID. Make sure Custom Robo is running.")
                 if dolphin.is_hooked():
                     dolphin.un_hook()
                 await asyncio.sleep(5)
                 continue
             
-            print("Connected to Dolphin with the correct game running.")
+            logger.info("Connected to Dolphin with the correct game running.")
             break
 
         except Exception as e:
             if dolphin.is_hooked():
                 dolphin.un_hook()
-            print(f"Could not connect to Dolphin: {e}")
-            print("Retrying in 5 seconds...")
+            logger.info(f"Could not connect to Dolphin: {e}")
+            logger.info("Retrying in 5 seconds...")
             await asyncio.sleep(5)
             continue
 
@@ -137,6 +138,7 @@ async def game_watcher(ctx: CRContext):
     It will run as long as the client is connected to the server.
     """
 
+    logger.info("Entering game watcher loop")
     # This initializes the set locations checked.
     checked_locations_in_game = set()
 
@@ -229,32 +231,37 @@ def main(*launch_args: str):
     # server_address: str = ""
     # rom_path: str = ""
 
+    Utils.init_logging("Custom Robo Client Name")
     logger.info("Starting Custom Robo Client v0.1")
 
-    parser = get_base_parser(ctx_defaults={"game": "Custom Robo"})
-    parser.add_arguement('apcr_file', default="", type=str, nargs="?", help="Path to an APCR file")
+    parser = get_base_parser()
+    logger.info("Parser acquired")
+    parser.add_argument('apcr_file', default="", type=str, nargs="?", help="Path to an APCR file")
+    logger.info("Argument passed")
     args = parser.parse_args(launch_args)
+    logger.info("Parser complete")
 
     async def _async_main(connect, password):
 
-        print("Entering async main")
+        logger.info("Entering async main")
 
         # Create our context and initialize the command processor.
         ctx = CRContext(connect, password)
         ctx.command_processor = CRCommandProcessor(ctx)
 
-        print("Command processor active")
+        logger.info("Command processor active")
 
         # Run the client!
         ctx.run_gui = gui_enabled
 
-        print("GUI enabled")
+        logger.info("GUI enabled")
 
         await dolphin_connect_loop(ctx)
 
-        print("Dolphin connection complete")
+        logger.info("Dolphin connection complete")
 
-        await server_loop(ctx, game_watcher, "Game")
+        game_watcher(ctx)
+        await server_loop(ctx, ctx.server_address)
 
     asyncio.run(_async_main(args.connect, args.password))
 
