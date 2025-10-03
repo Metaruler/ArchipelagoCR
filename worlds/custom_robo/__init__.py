@@ -17,8 +17,8 @@ from .rules import *
 from .cr_rom import CRPlayerContainer
 
 def run_client(*args):
-    from .CRClient import main
-    launch_subprocess(main, name="CustomRoboClient", args=args)
+    from .CRClient import sync_main
+    launch_subprocess(sync_main, name="CustomRoboClient", args=args)
 
 # Add Client launcher to Archi list
 components.append(
