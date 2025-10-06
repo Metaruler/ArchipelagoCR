@@ -15,6 +15,7 @@ from .locations import CRLocation, LOCATION_TABLE, RAHU_DEFEATED
 from .options import *
 from .rules import *
 from .cr_rom import CRPlayerContainer
+from .cr_settings import CRSettings
 
 def run_client(*args):
     from .CRClient import sync_main
@@ -41,6 +42,8 @@ class CRWorld(World):
     game: ClassVar[str] = "Custom Robo"
     options_dataclass = options.CROptions
     options: options.CROptions
+    topology_present: ClassVar[bool] = False
+    settings: CRSettings
 
     topology_present = False
     item_name_to_id: ClassVar[dict[str, int]] = {
