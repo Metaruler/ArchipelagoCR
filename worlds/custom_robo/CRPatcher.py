@@ -39,7 +39,6 @@ class CRPatcher:
         self.gcm = GCM(self.clean_iso_path)
         self.gcm.read_entire_disc()
         self.dol = DOL()
-        # DIY go find the actual DOL/REL location
         self.dol.read(self.gcm.read_file_data("sys/main.dol"))
 
         # Change game ID so save files are different
@@ -48,7 +47,6 @@ class CRPatcher:
         logger.info("Updating the ISO game id with the AP generated seed.")
         self.seed = self.output_data["Seed"]
         magic_seed = str(self.seed)
-        # DIY Change this too to match CR data
         bin_data = self.gcm.read_file_data("sys/boot.bin")
         bin_data.seek(0x01)
         bin_data.write(sbf.string_to_bytes(magic_seed, len(magic_seed)))
@@ -68,8 +66,10 @@ class CRPatcher:
         This function will create the Custom Robo patch
         """
 
-#        self.dol.save_changes() 
-#        self.gcm.changed_files["sys/main.dol"] = self.dol.data 
+        print("Entering patch save")
+
+        self.dol.save_changes()
+        self.gcm.changed_files["sys/main.dol"] = self.dol.data
 
         for _, _ in self.export_files_from_memory():
             continue
