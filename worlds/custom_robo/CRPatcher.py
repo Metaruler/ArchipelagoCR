@@ -1,6 +1,6 @@
 import os
 import json
-import struct, zipfile
+import zipfile
 
 from gclib.gcm import GCM
 from gclib.dol import DOL
@@ -61,4 +61,14 @@ class CRPatcher:
         if ap_world_version != CLIENT_VERSION:
             raise Utils.VersionException("Error! Client/World version mismatch detected.")
         
-    
+    def create_patch(self):
+        """
+        This function will create the Custom Robo patch
+        """
+
+        for _, _ in self.export_files_from_memory():
+            continue
+
+    def export_files_from_memory(self):
+        yield from self.gcm.export_disc_to_iso_with_changed_files(self.output_file_path)
+
