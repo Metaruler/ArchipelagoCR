@@ -40,8 +40,8 @@ class CRWorld(World):
     """
 
     game: ClassVar[str] = "Custom Robo"
-    options_dataclass = options.CROptions
-    options: options.CROptions
+    options_dataclass = CROptions
+    options: CROptions
     topology_present: ClassVar[bool] = False
     settings: CRSettings
 
