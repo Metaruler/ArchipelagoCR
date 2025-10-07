@@ -2,7 +2,7 @@ from typing import NamedTuple, Optional
 import asyncio
 
 CLIENT_NAME = "Custom Robo"
-CLIENT_VERSION = "v0.1"
+CLIENT_VERSION = "v0.1.0"
 
 AP_LOGGER_NAME = "Client"
 AP_WORLD_VERSION_NAME = "APWorldVersion"
@@ -43,3 +43,5 @@ class StringByteFunction:
         elif len(encoded_string) > encoded_byte_length:
             raise Exception("Provided string '" + user_string + "' was longer than the expected byte length of '" +
                             str(encoded_byte_length) + "', which will not be accepted by the info file.")
+
+        return encoded_string

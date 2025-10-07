@@ -124,6 +124,7 @@ class CRWorld(World):
             "Seed": self.multiworld.seed,
             "Slot": self.player,
             "Name": self.player_name,
+            "APWorldVersion": CLIENT_VERSION
         }
         # Outputs the plando details to our expected output file
         # Create the output path based on the current player + expected patch file ending.
@@ -135,12 +136,7 @@ class CRWorld(World):
         cr_container.write()
 
     def fill_slot_data(self):
-        try:
-            slot_data = {
-                "total_locations": len(LOCATION_TABLE)
-            }
-        except AttributeError:
-            slot_data = {
-                "total_locations": len(LOCATION_TABLE)
-            }
-        return slot_data
+        return {
+            "seed": self.multiworld.seed,
+            "total_locations": len(LOCATION_TABLE)
+        }

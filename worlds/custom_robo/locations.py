@@ -449,7 +449,8 @@ PART_USE: dict[str, CRLocationData] = {
     ram_addr=CRRamData(0x803BFBE6, bit_position=7)
   ),
   "Use Tomahawk G Bomb": CRLocationData(
-    code=101,
+    # TODO FIX NUMBERING
+    code=187,
     ram_addr=CRRamData(0x803BFBE6, bit_position=8)
   ),
   "Use Gemini B Bomb": CRLocationData(

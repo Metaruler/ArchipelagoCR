@@ -49,6 +49,7 @@ class CRContext(CommonContext):
         """
         super().__init__(server_address, password)
         self.dolphin_status = CONNECTION_INITIAL_STATUS
+        self.arg_seed = ""
 
     def run_gui(self):
         """Import kivy UI system from make_gui() and start running it as self.ui_task"""
@@ -66,21 +67,21 @@ class CRContext(CommonContext):
 
         match cmd:
             case "Connected":
-                arg_seed = str(slot_data["seed"])
-                try:
-                    # Read ISO seed
-                    iso_seed = read_string(0x80000000, len(arg_seed))
-                except Exception as genericEx:
-                    iso_seed = ""
-                    logger.error(str(genericEx))
-
-                if arg_seed != iso_seed:
-                    raise Exception("Error: Incorrect Custom Robo ISO File launched")
-                else:
-                    self.seed_verified = True
-                    logger.info("Game seed verified")
-
-                logger.info("Archipelago server connection successful")
+                self.arg_seed = str(slot_data["seed"])
+                # try:
+                #     # Read ISO seed
+                #     iso_seed = read_string(0x80000000, len(arg_seed))
+                # except Exception as genericEx:
+                #     iso_seed = ""
+                #     logger.error(str(genericEx))
+                #
+                # if arg_seed != iso_seed:
+                #     raise Exception("Error: Incorrect Custom Robo ISO File launched")
+                # else:
+                #     self.seed_verified = True
+                #     logger.info("Game seed verified")
+                #
+                # logger.info("Archipelago server connection successful")
                 self.game_running = True
             case "RecievedItems":
                 # Recieved Items are handled in a different function
@@ -217,6 +218,12 @@ class CRContext(CommonContext):
                 if not self.slot:
                     await wait_for_next_loop(5)
                     continue
+
+                arg_seed = read_string(0x80000001, len(str(self.arg_seed)))
+                if arg_seed != self.arg_seed:
+                    raise Exception(
+                        "Incorrect Custom Robo ISO file selected. The seed does not match." +
+                        "Please verify that you are using the right ISO/seed/apcr file.")
 
             except Exception as genericEx:
                 dolphin.un_hook()
