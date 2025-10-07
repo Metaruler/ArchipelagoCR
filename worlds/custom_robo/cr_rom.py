@@ -11,6 +11,7 @@ import json, logging, sys, os, zipfile, tempfile
 import urllib.request
 
 logger = logging.getLogger()
+CR_USA_MD5 = 0x546e5108173bceb4d5c8ca27b3fcfc96
 
 class InvalidCleanISOError(Exception):
     """
@@ -89,6 +90,17 @@ class CRUSAPatch(APPatch, metaclass=AutoPatchRegister):
             self.__get_remote_dependencies_and_create_iso(apcr_patch, output_file, cr_clean_iso)
         return output_file
 
+    def read_contents(self, apcr_patch: str) -> dict[str, Any]:
+        with zipfile.ZipFile(apcr_patch, "r") as zf:
+            with zf.open("archipelago.json", "r") as f:
+                manifest = json.load(f)
+
+        if manifest["compatible_version"] > self.version:
+            raise Exception(f"File (version: {manifest['compatible_version']}) too new for"
+                            f"this handler (version: {self.version})")
+        
+        return manifest
+
     @classmethod
     def verify_base_rom(cls, cr_rom_path: str, throw_on_missing_speedups: bool = False):
         # Check for valid USA installation of Custom Robo
@@ -119,8 +131,7 @@ class CRUSAPatch(APPatch, metaclass=AutoPatchRegister):
 
         # Double checks the file is correct first
         md5_conv = int(base_md5.hexdigest(), 16)
-        # DIY ask Mogul where the hash is
-        if md5_conv == 0: # Hash matching
+        if md5_conv != CR_USA_MD5: # Hash matching
             raise InvalidCleanISOError(f"Invalid vanilla Custom Robo ISO... check it is not corrupted!")
         
         # Double check correct iso format file extension

@@ -116,17 +116,7 @@ class CRWorld(World):
     def set_completion_rules(self):
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Defeat Rahu III", self.player)
 
-    def fill_slot_data(self):
-        try:
-            slot_data = {
-                "total_locations": len(LOCATION_TABLE)
-            }
-        except AttributeError:
-            slot_data = {
-                "total_locations": len(LOCATION_TABLE)
-            }
-        return slot_data
-    
+  
         # Output options, locations and doors for patcher
     def generate_output(self, output_directory: str):
         # Output seed name and slot number to seed RNG in randomizer client
@@ -143,3 +133,14 @@ class CRWorld(World):
         cr_container = CRPlayerContainer(output_data, patch_path, self.multiworld.player_name[self.player], self.player)
         # Write the expected output zip container to the Generated Seed folder.
         cr_container.write()
+
+    def fill_slot_data(self):
+        try:
+            slot_data = {
+                "total_locations": len(LOCATION_TABLE)
+            }
+        except AttributeError:
+            slot_data = {
+                "total_locations": len(LOCATION_TABLE)
+            }
+        return slot_data
