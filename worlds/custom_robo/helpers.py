@@ -36,6 +36,8 @@ class StringByteFunction:
         :param user_string: String that needs to be encoded to bytes.
         :param encoded_byte_length: Expected length of the provided string.
         """
+        #print("Encoded string before mods is: " + user_string)
+        #print("Byte length is: " + str(encoded_byte_length))
         encoded_string = user_string.encode('utf-8')
 
         if len(encoded_string) < encoded_byte_length:
@@ -43,5 +45,7 @@ class StringByteFunction:
         elif len(encoded_string) > encoded_byte_length:
             raise Exception("Provided string '" + user_string + "' was longer than the expected byte length of '" +
                             str(encoded_byte_length) + "', which will not be accepted by the info file.")
+
+        #print("Byte length is: " + str(encoded_byte_length))
 
         return encoded_string

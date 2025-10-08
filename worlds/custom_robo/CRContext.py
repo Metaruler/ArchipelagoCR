@@ -202,28 +202,34 @@ class CRContext(CommonContext):
 
                 if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
                     game_id = read_string(0x80000000, 6)
-                    if game_id not in ["GXCE01"]:
+                    # ID has not been modified, thus is a Vanilla ROM and should be Disconnected
+                    if game_id not in ["GXCEMT"]:
                         logger.info(CONNECTION_REFUSED_STATUS)
                         self.dolphin_status = CONNECTION_REFUSED_STATUS
                         dolphin.un_hook()
                         await wait_for_next_loop(5)
                         continue
 
-                # Ready for connection
-                if not self.dolphin_status == CONNECTION_VERIFY_SERVER:
-                    self.dolphin_status = CONNECTION_VERIFY_SERVER
-                    logger.info(self.dolphin_status)
-                await self.server_auth()
+                    arg_seed = read_string(0x80000001, len(str(self.arg_seed)))
+                    #logger.info("Seed in memory: " + arg_seed)
+                    #logger.info("Seed in Context: " + self.arg_seed)
+                    if arg_seed != self.arg_seed:
+                        raise Exception(
+                            "Incorrect Custom Robo ISO file selected. The seed does not match." +
+                            "Please verify that you are using the right ISO/seed/apcr file.")
 
-                if not self.slot:
-                    await wait_for_next_loop(5)
-                    continue
+                    self.locations_checked = set()
 
-                arg_seed = read_string(0x80000001, len(str(self.arg_seed)))
-                if arg_seed != self.arg_seed:
-                    raise Exception(
-                        "Incorrect Custom Robo ISO file selected. The seed does not match." +
-                        "Please verify that you are using the right ISO/seed/apcr file.")
+                    # Ready for connection
+                    if not self.dolphin_status == CONNECTION_VERIFY_SERVER:
+                        self.dolphin_status = CONNECTION_VERIFY_SERVER
+                        logger.info(self.dolphin_status)
+
+                    await self.server_auth()
+
+                    if not self.slot:
+                        await wait_for_next_loop(5)
+                        continue
 
             except Exception as genericEx:
                 dolphin.un_hook()

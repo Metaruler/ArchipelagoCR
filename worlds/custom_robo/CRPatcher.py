@@ -47,8 +47,13 @@ class CRPatcher:
         logger.info("Updating the ISO game id with the AP generated seed.")
         self.seed = self.output_data["Seed"]
         magic_seed = str(self.seed)
+        print("Magic Seed is :" + magic_seed)
         bin_data = self.gcm.read_file_data("sys/boot.bin")
-        bin_data.seek(0x01)
+        # Seek will put us right after the 6-byte Disk ID
+        bin_data.seek(0x04)
+        # Modify ISO ID to make it unique to our patch
+        bin_data.write(sbf.string_to_bytes("MT", 2))
+        # Write the Seed after the Disc ID to make it unique to multiworld
         bin_data.write(sbf.string_to_bytes(magic_seed, len(magic_seed)))
         self.gcm.changed_files["sys/boot.bin"] = bin_data
 
