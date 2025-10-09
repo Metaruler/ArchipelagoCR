@@ -79,20 +79,6 @@ class CRContext(CommonContext):
         match cmd:
             case "Connected":
                 self.arg_seed = str(slot_data["seed"])
-                # try:
-                #     # Read ISO seed
-                #     iso_seed = read_string(0x80000000, len(arg_seed))
-                # except Exception as genericEx:
-                #     iso_seed = ""
-                #     logger.error(str(genericEx))
-                #
-                # if arg_seed != iso_seed:
-                #     raise Exception("Error: Incorrect Custom Robo ISO File launched")
-                # else:
-                #     self.seed_verified = True
-                #     logger.info("Game seed verified")
-                #
-                # logger.info("Archipelago server connection successful")
                 self.game_running = True
             case "RecievedItems":
                 # Recieved Items are handled in a different function
@@ -113,19 +99,19 @@ class CRContext(CommonContext):
         It will run as long as the client is connected to the server.
         """
 
-        logger.info("Entering game watcher loop")
+        #logger.info("Entering game watcher loop")
 
         local_missing_locations = copy.deepcopy(self.missing_locations)
         for missing_locations in local_missing_locations:
             local_location_name = self.location_names.lookup_in_game(missing_locations)
             cr_local_data = LOCATION_TABLE[local_location_name]
-            logger.info("Before location value")
-            # Problem is RIGHT HERE
-            location_value = dolphin.read_bytes(cr_local_data.ram_addr[0], 1)[cr_local_data.ram_addr.bit_position]
-            logger.info("After location value")
+
+            location_value = dolphin.read_bytes(cr_local_data.ram_addr.ram_addr, 1)[0]
             # Check if part has been obtained and used
-            obtained_part = PARTS_ITEM_TABLE.get(local_location_name[4:]).update_ram_addr[0]
-            obtained_part_addr = dolphin.read_bytes(obtained_part.ram_addr, 1)[obtained_part.bit_position]
+            #logger.info(local_location_name[4:])
+            obtained_part = ALL_ITEMS_TABLE.get(local_location_name[4:]).update_ram_addr[0]
+            obtained_part_addr = dolphin.read_bytes(obtained_part.ram_addr, 1)[0]
+            #logger.info("After location value")
             if not location_value & obtained_part_addr:
                 self.locations_checked.add(missing_locations)
 
@@ -133,46 +119,12 @@ class CRContext(CommonContext):
         # Locations Checked is LOCAL locations in game
         # Checked Locations is AP SERVER STATE of locations
 
-        logger.info("Locations checked, checking for endgame")
+        #logger.info("Locations checked, checking for endgame")
 
-#        while not self.finished_game:
-#            # Check for new locations.
-#            # Replace these with the flags in locations py.
-#            set_check_locations = []
-#            newly_checked_locations = []
-#
-#            # Check for the usage flag to be set before checking reset
-#            for location_name, location_info in PART_USE.items():
-#                ram_data = location_info.get("ram_addr")
-#                location_value = dolphin.read_bytes(ram_data.ram_addr, 1)[0]
-#                if (location_value & (1 << ram_data.bit_position)) > 0:
-#                    set_check_locations.append(location_name, location_info)
-#
-#            # Check for part usage
-#            for location_name, location_info in set_check_locations.items():
-#                if location_name not in checked_locations_in_game:
-#                    # Reads the value at the locations RAM address.
-#                    try:
-#                        ram_data = location_info.get("ram_addr")
-#                        if ram_data:
-#                            # Read the value at the locations RAM address.
-#                            location_value = dolphin.read_bytes(ram_data.ram_addr, 1)[0]
-#                            # Check if the location's bit position has been reset in the value.
-#                            # (this indicates that the part has been used)
-#                            if (location_value & (1 << ram_data.bit_position)) < 1:
-#                                newly_checked_locations.append(location_name)
-#                                checked_locations_in_game.add(location_name)
-#                    except Exception as e:
-#                        print(f"Error reading location '{location_name}' at address {hex(location_info['ram_addr'])}: {e}")
-#
-#            if newly_checked_locations:
-#                print(f"Found new locations: {newly_checked_locations}")
-#                await self.send_checked_locations(newly_checked_locations)
-#
         if not self.finished_game:
             try:
                 # Get the RAM data for the final scene in the New Journey scenario. This is our "beating the game".
-                scenario_ram_data = LOCATION_TABLE["Rahu III Defeated"].ram_addr
+                scenario_ram_data = LOCATION_TABLE.get("Rahu III Defeated").ram_addr
 
                 if scenario_ram_data:
                     # Read the value at the event's memory address.
@@ -190,7 +142,7 @@ class CRContext(CommonContext):
                 # This will catch errors if the game state is not readable or the address is invalid.
                 print(f"Error checking for game completion: {e}")
 
-            logger.info("Endgame checked, checking for items")
+            #logger.info("Endgame checked, checking for items")
 
             # Check for new items.
             try:
@@ -218,11 +170,12 @@ class CRContext(CommonContext):
             for item_to_add in recv_items:
                 last_recv_idx += 1
 
-                item_name = self.item_id_to_name[item_to_add.item]
-                player_name = self.slot_to_player_name[item_to_add.player]
-                print(f"Received item: {item_name} from {player_name}.")
-
+                item_name = self.item_names.lookup_in_game(item_to_add.item)
                 item_info = ALL_ITEMS_TABLE.get(item_name)
+                # Sort as parts or not
+                #item_type = item_info.type
+                #player_name = self.slot_to_player_name[item_to_add.player]
+                #print(f"Received item: {item_name} from {player_name}.")
 
                 if item_info:
                     item_type = item_info["type"]
@@ -263,10 +216,10 @@ class CRContext(CommonContext):
                     dolphin.hook()
                     if dolphin.get_status() == dolphin.get_status().noEmu or dolphin.get_status() == dolphin.get_status().notRunning:
                         dolphin.un_hook()
-                    self.dolphin_status = CONNECTION_INITIAL_STATUS
-                    logger.info(self.dolphin_status)
-                    await wait_for_next_loop(5)
-                    continue
+                        self.dolphin_status = CONNECTION_INITIAL_STATUS
+                        logger.info(self.dolphin_status)
+                        await wait_for_next_loop(5)
+                        continue
 
                 if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
                     game_id = read_string(0x80000000, 6)
@@ -277,6 +230,10 @@ class CRContext(CommonContext):
                         dolphin.un_hook()
                         await wait_for_next_loop(5)
                         continue
+
+                    # Implement this eventually, would be nice
+                    #if not self.auth:
+                    #    self.auth = read_string(SLOT_NAME_ADDR, SLOT_NAME_STR_LENGTH)
 
                     self.locations_checked = set()
 
