@@ -23,7 +23,7 @@ class CRRamData(NamedTuple):
     in_game_room_id: Optional[int] = None
     item_count: Optional[int] = None
 
-async def wait_for_next_loop(time_to_wait: int):
+async def wait_for_next_loop(time_to_wait: float):
     await asyncio.sleep(time_to_wait)
 
 class StringByteFunction:

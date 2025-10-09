@@ -1,7 +1,9 @@
 # Python imports
+import copy
 from typing import Dict
 import asyncio
 
+import NetUtils
 # AP imports
 from CommonClient import CommonContext, logger, logging
 
@@ -12,10 +14,15 @@ import dolphin_memory_engine as dolphin
 from .CRClient import CRCommandProcessor
 from .helpers import *
 from .locations import PART_USE, LOCATION_TABLE
-from .items import ALL_ITEMS_TABLE
+from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE
 
 from worlds.tww.TWWClient import read_string
 
+WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
+
+# Current assumption is that these are unused, will need to change if this is untrue
+LAST_RECV_ITEM_ADDR = 0x804A2174
+NOT_SAVE_LAST_RECV_ITEM_ADDR = 0x804A2175
 
 #--------------------------------------------------------------------
 #Context for CR
@@ -50,6 +57,10 @@ class CRContext(CommonContext):
         super().__init__(server_address, password)
         self.dolphin_status = CONNECTION_INITIAL_STATUS
         self.arg_seed = ""
+
+        self.last_received_idx: int = 0
+        self.non_save_last_recv_idx: int = 0
+
 
     def run_gui(self):
         """Import kivy UI system from make_gui() and start running it as self.ui_task"""
@@ -103,65 +114,109 @@ class CRContext(CommonContext):
         """
 
         logger.info("Entering game watcher loop")
-        # This initializes the set locations checked.
-        checked_locations_in_game = set()
 
-        while not self.finished_game:
-            # Check for new locations.
-            # Replace these with the flags in locations py.
-            set_check_locations = []
-            newly_checked_locations = []
+        local_missing_locations = copy.deepcopy(self.missing_locations)
+        for missing_locations in local_missing_locations:
+            local_location_name = self.location_names.lookup_in_game(missing_locations)
+            cr_local_data = LOCATION_TABLE[local_location_name]
+            logger.info("Before location value")
+            # Problem is RIGHT HERE
+            location_value = dolphin.read_bytes(cr_local_data.ram_addr[0], 1)[cr_local_data.ram_addr.bit_position]
+            logger.info("After location value")
+            # Check if part has been obtained and used
+            obtained_part = PARTS_ITEM_TABLE.get(local_location_name[4:]).update_ram_addr[0]
+            obtained_part_addr = dolphin.read_bytes(obtained_part.ram_addr, 1)[obtained_part.bit_position]
+            if not location_value & obtained_part_addr:
+                self.locations_checked.add(missing_locations)
 
-            # Check for the usage flag to be set before checking reset
-            for location_name, location_info in PART_USE.items():
-                ram_data = location_info.get("ram_addr")
-                location_value = dolphin.read_bytes(ram_data.ram_addr, 1)[0]
-                if (location_value & (1 << ram_data.bit_position)) > 0:
-                    set_check_locations.append(location_name, location_info)
+        await self.check_locations(self.locations_checked)
+        # Locations Checked is LOCAL locations in game
+        # Checked Locations is AP SERVER STATE of locations
 
-            # Check for part usage
-            for location_name, location_info in set_check_locations.items():
-                if location_name not in checked_locations_in_game:
-                    # Reads the value at the locations RAM address.
-                    try:
-                        ram_data = location_info.get("ram_addr")
-                        if ram_data:
-                            # Read the value at the locations RAM address.
-                            location_value = dolphin.read_bytes(ram_data.ram_addr, 1)[0]
-                            # Check if the location's bit position has been reset in the value.
-                            # (this indicates that the part has been used)
-                            if (location_value & (1 << ram_data.bit_position)) < 1:
-                                newly_checked_locations.append(location_name)
-                                checked_locations_in_game.add(location_name)
-                    except Exception as e:
-                        print(f"Error reading location '{location_name}' at address {hex(location_info['ram_addr'])}: {e}")
+        logger.info("Locations checked, checking for endgame")
 
-            if newly_checked_locations:
-                print(f"Found new locations: {newly_checked_locations}")
-                await self.send_checked_locations(newly_checked_locations)
+#        while not self.finished_game:
+#            # Check for new locations.
+#            # Replace these with the flags in locations py.
+#            set_check_locations = []
+#            newly_checked_locations = []
+#
+#            # Check for the usage flag to be set before checking reset
+#            for location_name, location_info in PART_USE.items():
+#                ram_data = location_info.get("ram_addr")
+#                location_value = dolphin.read_bytes(ram_data.ram_addr, 1)[0]
+#                if (location_value & (1 << ram_data.bit_position)) > 0:
+#                    set_check_locations.append(location_name, location_info)
+#
+#            # Check for part usage
+#            for location_name, location_info in set_check_locations.items():
+#                if location_name not in checked_locations_in_game:
+#                    # Reads the value at the locations RAM address.
+#                    try:
+#                        ram_data = location_info.get("ram_addr")
+#                        if ram_data:
+#                            # Read the value at the locations RAM address.
+#                            location_value = dolphin.read_bytes(ram_data.ram_addr, 1)[0]
+#                            # Check if the location's bit position has been reset in the value.
+#                            # (this indicates that the part has been used)
+#                            if (location_value & (1 << ram_data.bit_position)) < 1:
+#                                newly_checked_locations.append(location_name)
+#                                checked_locations_in_game.add(location_name)
+#                    except Exception as e:
+#                        print(f"Error reading location '{location_name}' at address {hex(location_info['ram_addr'])}: {e}")
+#
+#            if newly_checked_locations:
+#                print(f"Found new locations: {newly_checked_locations}")
+#                await self.send_checked_locations(newly_checked_locations)
+#
+        if not self.finished_game:
+            try:
+                # Get the RAM data for the final scene in the New Journey scenario. This is our "beating the game".
+                scenario_ram_data = LOCATION_TABLE["Rahu III Defeated"].ram_addr
 
-            if not self.finished_game:
-                try:
-                    # Get the RAM data for the final scene in the New Journey scenario. This is our "beating the game". 
-                    scenario_ram_data = LOCATION_TABLE["Rahu III Defeated"].get("ram_addr")
+                if scenario_ram_data:
+                    # Read the value at the event's memory address.
+                    boss_defeated_value = dolphin.read_bytes(scenario_ram_data.ram_addr, 1)[0]
 
-                    if scenario_ram_data:
-                        # Read the value at the event's memory address.
-                        boss_defeated_value = dolphin.read_bytes(scenario_ram_data.ram_addr, 1)[0]
+                    # Check if the bit for defeating Rahu is set.
+                    if boss_defeated_value == 18:
+                        print("Final boss defeated! Signaling game completion to the server.")
+                        self.finished_game = True # Ends loop on next pass
+                        await self.send_msgs([{
+                            "cmd": "StatusUpdate",
+                            "status": NetUtils.ClientStatus.CLIENT_GOAL,
+                        }])
+            except Exception as e:
+                # This will catch errors if the game state is not readable or the address is invalid.
+                print(f"Error checking for game completion: {e}")
 
-                        # Check if the bit for defeating Redips is set.
-                        if boss_defeated_value == 18:
-                            print("Final boss defeated! Signaling game completion to the server.")
-
-                            await self.send_goal()
-                            self.finished_game = True  # This ends the while loop on the next pass.
-                except Exception as e:
-                    # This will catch errors if the game state is not readable or the address is invalid.
-                    print(f"Error checking for game completion: {e}")
+            logger.info("Endgame checked, checking for items")
 
             # Check for new items.
-            while self.items_received:
-                item_to_add = self.items_received.pop(0)
+            try:
+                ram_bytes = dolphin.read_bytes(LAST_RECV_ITEM_ADDR, 4)
+                last_recv_idx = int.from_bytes(ram_bytes, "big")
+            except Exception as e:
+                logger.warning(f"Failed to read saveable index from RAM: {e}")
+                last_recv_idx = 0
+
+            # If true, we have no items to account for
+            if len(self.items_received) == last_recv_idx:
+                return
+
+            # Otherwise, allocate items since last save
+            self.last_received_idx = last_recv_idx
+            try:
+                non_save_bytes = dolphin.read_bytes(NOT_SAVE_LAST_RECV_ITEM_ADDR, 4)
+                self.non_save_last_recv_idx = int.from_bytes(non_save_bytes, "big")
+            except Exception as e:
+                logger.warning(f"Failed to read non-saveable index from RAM: {e}")
+                self.non_save_last_recv_idx = 0
+
+            recv_items = self.items_received[last_recv_idx:]
+
+            for item_to_add in recv_items:
+                last_recv_idx += 1
 
                 item_name = self.item_id_to_name[item_to_add.item]
                 player_name = self.slot_to_player_name[item_to_add.player]
@@ -178,10 +233,23 @@ class CRContext(CommonContext):
                 else:
                     print(f"Error: Could not find type information for item ID {item_to_add.item}.")
 
-            await asyncio.sleep(1) # Can set this so sleep to avoid CPU usage.
+    async def server_auth(self, password_requested: bool = False):
+        """
+        Authenticate with the Archipelago server.
 
-        # dolphin.disconnect()
-        print("Disconnected from Dolphin.")
+        :param password_requested: Whether the server requires a password. Defaults to `False`.
+        """
+        if password_requested and not self.password:
+            await super(CRContext, self).server_auth(password_requested)
+        if self.dolphin_status != CONNECTION_VERIFY_SERVER:
+            return
+        if not self.auth:
+            await self.get_username()
+        await self.send_connect()
+
+        if self.slot:
+            logger.info(CONNECTION_CONNECTED_STATUS)
+            self.dolphin_status = CONNECTION_CONNECTED_STATUS
 
     # Starts the full loop and debug messages for connecting to Dolphin.
     async def dolphin_connect_loop(self):
@@ -210,14 +278,6 @@ class CRContext(CommonContext):
                         await wait_for_next_loop(5)
                         continue
 
-                    arg_seed = read_string(0x80000001, len(str(self.arg_seed)))
-                    #logger.info("Seed in memory: " + arg_seed)
-                    #logger.info("Seed in Context: " + self.arg_seed)
-                    if arg_seed != self.arg_seed:
-                        raise Exception(
-                            "Incorrect Custom Robo ISO file selected. The seed does not match." +
-                            "Please verify that you are using the right ISO/seed/apcr file.")
-
                     self.locations_checked = set()
 
                     # Ready for connection
@@ -230,6 +290,17 @@ class CRContext(CommonContext):
                     if not self.slot:
                         await wait_for_next_loop(5)
                         continue
+
+                    arg_seed = read_string(0x80000006, len(str(self.arg_seed)))
+                    logger.info("Seed in memory: " + arg_seed)
+                    logger.info("Seed in Context: " + self.arg_seed)
+                    if arg_seed != self.arg_seed:
+                        raise Exception(
+                            "Incorrect Custom Robo ISO file selected. The seed does not match." +
+                            "Please verify that you are using the right ISO/seed/apcr file.")
+
+                await self.game_watcher()
+                await wait_for_next_loop(WAIT_TIMER_SHORT_TIMEOUT)
 
             except Exception as genericEx:
                 dolphin.un_hook()
