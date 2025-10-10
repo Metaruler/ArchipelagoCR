@@ -49,11 +49,11 @@ class CRPatcher:
         magic_seed = str(self.seed)
         print("Magic Seed is :" + magic_seed)
         bin_data = self.gcm.read_file_data("sys/boot.bin")
-        # Seek will put us right after the 6-byte Disk ID
-        bin_data.seek(0x04)
+        # Seek will put us right after the first letter G of the Disk ID
+        bin_data.seek(0x01)
         # Modify ISO ID to make it unique to our patch
-        bin_data.write(sbf.string_to_bytes("MT", 2))
-        # Write the Seed after the Disc ID to make it unique to multiworld
+        #bin_data.write(sbf.string_to_bytes("MT", 2))
+        # Write the Seed into the Disk ID to make it unique to multiworld
         bin_data.write(sbf.string_to_bytes(magic_seed, len(magic_seed)))
         self.gcm.changed_files["sys/boot.bin"] = bin_data
 

@@ -17,6 +17,7 @@ from .locations import PART_USE, LOCATION_TABLE
 from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE
 
 from worlds.tww.TWWClient import read_string
+from ..oot.Messages import bytes_to_int
 
 WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
 
@@ -106,13 +107,13 @@ class CRContext(CommonContext):
             local_location_name = self.location_names.lookup_in_game(missing_locations)
             cr_local_data = LOCATION_TABLE[local_location_name]
 
-            location_value = dolphin.read_bytes(cr_local_data.ram_addr.ram_addr, 1)[0]
+            location_value = dolphin.read_bytes(cr_local_data.ram_addr.ram_addr, 8)[cr_local_data.ram_addr.bit_position]
             # Check if part has been obtained and used
-            #logger.info(local_location_name[4:])
             obtained_part = ALL_ITEMS_TABLE.get(local_location_name[4:]).update_ram_addr[0]
-            obtained_part_addr = dolphin.read_bytes(obtained_part.ram_addr, 1)[0]
-            #logger.info("After location value")
-            if not location_value & obtained_part_addr:
+            obtained_part_addr = dolphin.read_bytes(obtained_part.ram_addr, 8)[obtained_part.bit_position]
+            if (not location_value) & obtained_part_addr:
+                logger.info(f"Location Value: {location_value} and Obtained Part Address: {obtained_part_addr}")
+                logger.info(str(dolphin.read_bytes(obtained_part.ram_addr, 8)))
                 self.locations_checked.add(missing_locations)
 
         await self.check_locations(self.locations_checked)
@@ -180,9 +181,10 @@ class CRContext(CommonContext):
                 if item_info:
                     item_type = item_info["type"]
                     if item_type == "Body" or item_type == "Gun" or item_type == "Bomb" or item_type == "Pod" or item_type == "Legs":
-                        dolphin.write_bytes(item_info.update_ram_addr, 1)
                         location_edit = "Use " + item_info.name
+                        # Write location BEFORE item gain to enable the check
                         dolphin.write_bytes(LOCATION_TABLE[location_edit].ram_addr, 1)
+                        dolphin.write_bytes(item_info.update_ram_addr, 1)
                 else:
                     print(f"Error: Could not find type information for item ID {item_to_add.item}.")
 
@@ -224,7 +226,7 @@ class CRContext(CommonContext):
                 if not self.dolphin_status == CONNECTION_CONNECTED_STATUS:
                     game_id = read_string(0x80000000, 6)
                     # ID has not been modified, thus is a Vanilla ROM and should be Disconnected
-                    if game_id not in ["GXCEMT"]:
+                    if game_id in ["GXCE01"]:
                         logger.info(CONNECTION_REFUSED_STATUS)
                         self.dolphin_status = CONNECTION_REFUSED_STATUS
                         dolphin.un_hook()
@@ -248,7 +250,7 @@ class CRContext(CommonContext):
                         await wait_for_next_loop(5)
                         continue
 
-                    arg_seed = read_string(0x80000006, len(str(self.arg_seed)))
+                    arg_seed = read_string(0x80000001, len(str(self.arg_seed)))
                     logger.info("Seed in memory: " + arg_seed)
                     logger.info("Seed in Context: " + self.arg_seed)
                     if arg_seed != self.arg_seed:
