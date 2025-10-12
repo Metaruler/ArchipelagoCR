@@ -170,13 +170,17 @@ class CRContext(CommonContext):
                 logger.warning(f"Failed to read non-saveable index from RAM: {e}")
                 self.non_save_last_recv_idx = 0
 
+            # Get only new items since last save
             recv_items = self.items_received[last_recv_idx:]
 
+            # Process each new item
             for item_to_add in recv_items:
                 last_recv_idx += 1
 
                 item_name = self.item_names.lookup_in_game(item_to_add.item)
+                logger.print(item_name)
                 item_info = ALL_ITEMS_TABLE.get(item_name)
+                logger.print(item_info)
                 # Sort as parts or not
                 #item_type = item_info.type
                 #player_name = self.slot_to_player_name[item_to_add.player]
@@ -187,7 +191,8 @@ class CRContext(CommonContext):
                     if item_type == "Body" or item_type == "Gun" or item_type == "Bomb" or item_type == "Pod" or item_type == "Legs":
                         location_edit = "Use " + item_info.name
                         # Write location BEFORE item gain to enable the check
-                        dolphin.write_bytes(LOCATION_TABLE[location_edit].ram_addr, 1)
+                        logger.print("Writing to drop location in memory...")
+                        dolphin.write_bytes(LOCATION_TABLE[location_edit].ram_addr.ram_addr, 1)
                         dolphin.write_bytes(item_info.update_ram_addr, 1)
                 else:
                     print(f"Error: Could not find type information for item ID {item_to_add.item}.")

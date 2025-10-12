@@ -42,12 +42,11 @@ class CRWorld(World):
     game: ClassVar[str] = "Custom Robo"
     options_dataclass = CROptions
     options: CROptions
-    topology_present: ClassVar[bool] = False
-    settings: CRSettings
-
     topology_present = False
+    settings = CRSettings
+
     item_name_to_id: ClassVar[dict[str, int]] = {
-        name: CRItem.get_apid(data.code) for name, data in ALL_ITEMS_TABLE.items()
+        name: data.code for name, data in ALL_ITEMS_TABLE.items()
     }
     location_name_to_id: ClassVar[dict[str, int]] = {
         name: data.code for name, data in LOCATION_TABLE.items()
