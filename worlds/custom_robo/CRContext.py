@@ -17,13 +17,13 @@ from .locations import PART_USE, LOCATION_TABLE
 from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE
 
 from worlds.tww.TWWClient import read_string
-from ..oot.Messages import bytes_to_int
+from ..oot.Messages import bytes_to_int, int_to_bytes
 
 WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
 
 # Current assumption is that these are unused, will need to change if this is untrue
-LAST_RECV_ITEM_ADDR = 0x804A2190
-NOT_SAVE_LAST_RECV_ITEM_ADDR = 0x804A2194
+LAST_RECV_ITEM_ADDR = 0x80462AD8
+NOT_SAVE_LAST_RECV_ITEM_ADDR = 0x80462ADC
 
 #--------------------------------------------------------------------
 #Context for CR
@@ -196,22 +196,32 @@ class CRContext(CommonContext):
                 last_recv_idx += 1
 
                 item_name = self.item_names.lookup_in_game(item_to_add.item)
-                logger.print(item_name)
+                #logger.print(item_name)
                 item_info = ALL_ITEMS_TABLE.get(item_name)
-                logger.print(item_info)
+                #logger.print(item_info)
                 # Sort as parts or not
                 #item_type = item_info.type
                 #player_name = self.slot_to_player_name[item_to_add.player]
                 #print(f"Received item: {item_name} from {player_name}.")
-                logger.info("Recieved new item, updating memory")
+                #logger.info("Recieved new item, updating memory")
                 if item_info:
-                    item_type = item_info["type"]
+                    item_type = item_info.type
                     if item_type == "Body" or item_type == "Gun" or item_type == "Bomb" or item_type == "Pod" or item_type == "Legs":
-                        location_edit = "Use " + item_info.name
+                        location_edit = "Use " + item_name
                         # Write location BEFORE item gain to enable the check
                         # logger.print("Writing to drop location in memory...")
-                        dolphin.write_bytes(LOCATION_TABLE[location_edit].ram_addr.ram_addr, 1)
-                        dolphin.write_bytes(item_info.update_ram_addr, 1)
+                        usage_loc = LOCATION_TABLE[location_edit].ram_addr.ram_addr
+                        usage_byte = bytes_to_int(dolphin.read_bytes(usage_loc, 1))
+                        usage_flag = LOCATION_TABLE[location_edit].ram_addr.bit_position
+                        usage_mesh = int_to_bytes(usage_byte | (1 << usage_flag), 1)
+                        # Calculate matching item gain and assign simultaneously
+                        item_loc = item_info.update_ram_addr[0].ram_addr
+                        item_byte = bytes_to_int(dolphin.read_bytes(item_loc, 1))
+                        item_flag = item_info.update_ram_addr[0].bit_position
+                        item_mesh = int_to_bytes(item_byte | (1 << item_flag), 1)
+                        # Write to memory
+                        dolphin.write_bytes(usage_loc, usage_mesh)
+                        dolphin.write_bytes(item_loc, item_mesh)
                 else:
                     print(f"Error: Could not find type information for item ID {item_to_add.item}.")
 
