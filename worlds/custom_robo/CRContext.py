@@ -22,8 +22,8 @@ from ..oot.Messages import bytes_to_int
 WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
 
 # Current assumption is that these are unused, will need to change if this is untrue
-LAST_RECV_ITEM_ADDR = 0x804A2174
-NOT_SAVE_LAST_RECV_ITEM_ADDR = 0x804A2175
+LAST_RECV_ITEM_ADDR = 0x804A2190
+NOT_SAVE_LAST_RECV_ITEM_ADDR = 0x804A2194
 
 #--------------------------------------------------------------------
 #Context for CR
@@ -81,9 +81,6 @@ class CRContext(CommonContext):
             case "Connected":
                 self.arg_seed = str(slot_data["seed"])
                 self.game_running = True
-            case "RecievedItems":
-                # Recieved Items are handled in a different function
-                pass
 
     async def disconnect(self, allow_autoreconnect = False):
         await super().disconnect(allow_autoreconnect)
@@ -93,6 +90,27 @@ class CRContext(CommonContext):
         self.seed_verified = False
         self.dolphin_connected = False
         self.already_fired_events = False
+
+    def update_received_index(self, last_recov_idx: int):
+        """
+        This will write the current item index to saveable and non-saveable RAM address using 4 byte write
+        to overall prevent player from getting EVERY check every time they log in.
+        """
+        self.last_received_idx = last_recov_idx
+
+        byte_data = last_recov_idx.to_bytes(4, 'big')
+
+        try:
+            dolphin.write_bytes(LAST_RECV_ITEM_ADDR, byte_data)
+        except Exception as e:
+            logger.info(f"Error writing 4-byte index to LAST RECOV ITEM ADDR: {e}")
+
+        if last_recov_idx > self.non_save_last_recv_idx:
+            self.non_save_last_recv_idx = last_recov_idx
+            try:
+                dolphin.write_bytes(NOT_SAVE_LAST_RECV_ITEM_ADDR, byte_data)
+            except Exception as e:
+                logger.info(f"Error writing 4-byte index to NOT SAVE LAST RECOV ITEM")
 
     async def game_watcher(self):
         """
@@ -185,17 +203,22 @@ class CRContext(CommonContext):
                 #item_type = item_info.type
                 #player_name = self.slot_to_player_name[item_to_add.player]
                 #print(f"Received item: {item_name} from {player_name}.")
-
+                logger.info("Recieved new item, updating memory")
                 if item_info:
                     item_type = item_info["type"]
                     if item_type == "Body" or item_type == "Gun" or item_type == "Bomb" or item_type == "Pod" or item_type == "Legs":
                         location_edit = "Use " + item_info.name
                         # Write location BEFORE item gain to enable the check
-                        logger.print("Writing to drop location in memory...")
+                        # logger.print("Writing to drop location in memory...")
                         dolphin.write_bytes(LOCATION_TABLE[location_edit].ram_addr.ram_addr, 1)
                         dolphin.write_bytes(item_info.update_ram_addr, 1)
                 else:
                     print(f"Error: Could not find type information for item ID {item_to_add.item}.")
+
+                self.update_received_index(last_recv_idx)
+                continue
+            self.update_received_index(last_recv_idx)
+
 
     async def server_auth(self, password_requested: bool = False):
         """

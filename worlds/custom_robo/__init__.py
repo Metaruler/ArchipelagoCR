@@ -118,17 +118,18 @@ class CRWorld(World):
   
         # Output options, locations and doors for patcher
     def generate_output(self, output_directory: str):
+        # Outputs the plando details to our expected output file
+        # Create the output path based on the current player + expected patch file ending.
+        patch_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}"
+            f"{CRPlayerContainer.patch_file_ending}")
         # Output seed name and slot number to seed RNG in randomizer client
         output_data = {
             "Seed": self.multiworld.seed,
             "Slot": self.player,
             "Name": self.player_name,
+            "Locations": {},
             "APWorldVersion": CLIENT_VERSION
         }
-        # Outputs the plando details to our expected output file
-        # Create the output path based on the current player + expected patch file ending.
-        patch_path = os.path.join(output_directory, f"{self.multiworld.get_out_file_name_base(self.player)}"
-            f"{CRPlayerContainer.patch_file_ending}")
         # Create a zip (container) that will contain all the necessary output files for us to use during patching.
         cr_container = CRPlayerContainer(output_data, patch_path, self.multiworld.player_name[self.player], self.player)
         # Write the expected output zip container to the Generated Seed folder.

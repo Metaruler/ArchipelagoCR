@@ -1,5 +1,6 @@
 import os
 import json
+import struct
 import zipfile
 
 from gclib.gcm import GCM
@@ -10,6 +11,9 @@ import Utils
 from .items import ALL_ITEMS_TABLE, CRItemData
 from .locations import LOCATION_TABLE, CRLocationData
 from .helpers import CLIENT_VERSION, AP_WORLD_VERSION_NAME, StringByteFunction as sbf
+from CommonClient import logger
+
+from ..oot.Messages import bytes_to_int
 
 class CRPatcher:
     def __init__(self, patch_file_path: str):
@@ -57,6 +61,45 @@ class CRPatcher:
         bin_data.write(sbf.string_to_bytes(magic_seed, len(magic_seed)))
         self.gcm.changed_files["sys/boot.bin"] = bin_data
 
+    def write_item_to_location(self, location_name: str, item_name: str):
+        """
+        This function to look up the correct addresses and IDs and write the new item into the memory.
+        """
+        try:
+            # 1 - We will look up the locations address from Location table
+            if location_name not in LOCATION_TABLE:
+                print(f"Warning: Skipping unknown '{location_name}'.")
+                return
+
+            # 2 - Look up the Item's ID from ALL_ITEMS_TABLE
+            if item_name not in ALL_ITEMS_TABLE:
+                print(f"Warning: Skipping Unknown Item '{item_name}'.")
+                return
+
+            #location_data: CRLocationData = LOCATION_TABLE[location_name]
+            #dol_address = location_data.ram_addr
+#
+            #item_data: CRItemData = ALL_ITEMS_TABLE[item_name]
+            ## This access our item ID from our Data class to tell this randomizer WHICH item it is.
+            #item_ramloc = item_data.update_ram_addr[0].ram_addr
+            #item_bitpos = item_data.update_ram_addr[0].bit_position
+            #logger.info("Position accessed")
+#
+            ## Writes the New Item ID to the DOL - - - - -
+            ## This coverts the Item ID into the byte sequence.
+            ##item_id_bytes = struct.pack(">I", item_rom_id)
+            #self.dol.data.seek(item_ramloc)
+            #part_flags = self.dol.data.read1(1)
+            #part_flags_int = bytes_to_int(part_flags)
+            #item_id_bytes = (part_flags_int & (1 << item_bitpos))
+            #self.dol.data.seek(item_ramloc)
+            #self.dol.data.write(item_id_bytes)
+            #logger.info("Line 90")
+
+        except Exception as e:
+            print(f"An error occured while writing data for location '{location_name}' and item '{item_name}': {e}")
+            return
+
     def _check_apworld_version(self, output_data):
         """
         Compares the AP version in the patch to the client version
@@ -72,6 +115,10 @@ class CRPatcher:
         """
 
         print("Entering patch save")
+        print("Applying Randomized Item Patches...")
+        for location_name, item_name in self.output_data["Locations"].items():
+            self.write_item_to_location(location_name, item_name)
+        print("Randomized item patching complete")
 
         self.dol.save_changes()
         self.gcm.changed_files["sys/main.dol"] = self.dol.data
