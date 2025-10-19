@@ -40,6 +40,7 @@ class CRContext(CommonContext):
     seed_verified: bool = False
     already_fired_events = False
     game_running = False
+    parts_not_suppressed = True
 
     item_id_to_name: Dict[int, str]
     slot_to_player_name: Dict[int, str]
@@ -119,6 +120,12 @@ class CRContext(CommonContext):
         """
 
         #logger.info("Entering game watcher loop")
+
+        #Lazy implementation to prevent natural part drops from the game
+        #if self.parts_not_suppressed:
+        if bytes_to_int(dolphin.read_bytes(0x803BF9D7, 1)) != 0xFF:
+            dolphin.write_bytes(0x803BF9D7, int_to_bytes(0xFF, 1))
+            #self.parts_not_suppressed = False
 
         local_missing_locations = copy.deepcopy(self.missing_locations)
         for missing_locations in local_missing_locations:
@@ -206,7 +213,8 @@ class CRContext(CommonContext):
                 #logger.info("Recieved new item, updating memory")
                 if item_info:
                     item_type = item_info.type
-                    if item_type == "Body" or item_type == "Gun" or item_type == "Bomb" or item_type == "Pod" or item_type == "Legs":
+                    # TODO add in Rahu Evolution
+                    if item_type == "Body" or item_type == "Gun" or item_type == "Bomb" or item_type == "Pod" or item_type == "Legs" or item_type == "Rahu Part":
                         location_edit = "Use " + item_name
                         # Write location BEFORE item gain to enable the check
                         # logger.print("Writing to drop location in memory...")
