@@ -22,8 +22,8 @@ from ..oot.Messages import bytes_to_int, int_to_bytes
 WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
 
 # Current assumption is that these are unused, will need to change if this is untrue
-LAST_RECV_ITEM_ADDR = 0x80462AD8
-NOT_SAVE_LAST_RECV_ITEM_ADDR = 0x80462ADC
+LAST_RECV_ITEM_ADDR = 0x803BFB8E
+NOT_SAVE_LAST_RECV_ITEM_ADDR = 0x803BFB92
 GAME_STARTED_ADDR = 0x803BF933 # Location that changes to 116 whenever loaded into a file
 DROP_TRIGGER_TOGGLE_ADDR = 0x803BFBEA # Location used to do memory clear logic
 
