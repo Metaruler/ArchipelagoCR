@@ -83,7 +83,7 @@ class CRWorld(World):
         starting_parts = []
         item_pool = []
         for item_name, item_data in ALL_ITEMS_TABLE.items():
-            if item_name == "Ray 01" or item_name == "Basic Gun" or item_name == "Standard Bomb" or item_name == "Standard Pod" or item_name == "Standard Legs":
+            if item_name == "Glory" or item_name == "Gatling Gun" or item_name == "Standard Bomb" or item_name == "Standard Pod" or item_name == "Standard Legs":
                 starting_parts.append(self.create_item(item_name))
             else: 
                 item_pool.append(self.create_item(item_name))

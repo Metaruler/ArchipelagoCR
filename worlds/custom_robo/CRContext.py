@@ -24,6 +24,8 @@ WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
 # Current assumption is that these are unused, will need to change if this is untrue
 LAST_RECV_ITEM_ADDR = 0x80462AD8
 NOT_SAVE_LAST_RECV_ITEM_ADDR = 0x80462ADC
+GAME_STARTED_ADDR = 0x803BF933 # Location that changes to 116 whenever loaded into a file
+DROP_TRIGGER_TOGGLE_ADDR = 0x803BFBEA # Location used to do memory clear logic
 
 #--------------------------------------------------------------------
 #Context for CR
@@ -121,6 +123,7 @@ class CRContext(CommonContext):
 
         #logger.info("Entering game watcher loop")
 
+
         #Lazy implementation to prevent natural part drops from the game
         #if self.parts_not_suppressed:
         if bytes_to_int(dolphin.read_bytes(0x803BF9D7, 1)) != 0xFF:
@@ -174,68 +177,87 @@ class CRContext(CommonContext):
 
             #logger.info("Endgame checked, checking for items")
 
-            # Check for new items.
-            try:
-                ram_bytes = dolphin.read_bytes(LAST_RECV_ITEM_ADDR, 4)
-                last_recv_idx = int.from_bytes(ram_bytes, "big")
-            except Exception as e:
-                logger.warning(f"Failed to read saveable index from RAM: {e}")
-                last_recv_idx = 0
+            if bytes_to_int(dolphin.read_bytes(GAME_STARTED_ADDR, 1)) > 0:
+                # On first start, wipe part memory before receiving starter items
+                if not (bytes_to_int(dolphin.read_bytes(DROP_TRIGGER_TOGGLE_ADDR, 1)) & (1 << 1)):
+                    # Clear all initial part flags before processing items
+                    mem_zeroes = int_to_bytes(0x00,1)
+                    dolphin.write_bytes(0x803BFB9F, mem_zeroes)
+                    dolphin.write_bytes(0x803BFBBF, mem_zeroes)
+                    dolphin.write_bytes(0x803BFBDF, mem_zeroes)
+                    dolphin.write_bytes(0x803BFBFF, mem_zeroes)
+                    dolphin.write_bytes(0x803BFC1F, mem_zeroes)
+                    dolphin.write_bytes(0x803BFBA7, mem_zeroes)
+                    dolphin.write_bytes(0x803BFBC7, mem_zeroes)
+                    dolphin.write_bytes(0x803BFBE7, mem_zeroes)
+                    dolphin.write_bytes(0x803BFC07, mem_zeroes)
+                    dolphin.write_bytes(0x803BFC1F, mem_zeroes)
+                    toggle_int = bytes_to_int(dolphin.read_bytes(DROP_TRIGGER_TOGGLE_ADDR, 1))
+                    item_mesh = int_to_bytes(toggle_int | (1 << 1), 1)
+                    dolphin.write_bytes(DROP_TRIGGER_TOGGLE_ADDR, item_mesh)
 
-            # If true, we have no items to account for
-            if len(self.items_received) == last_recv_idx:
-                return
+                # Check for new items.
+                try:
+                    ram_bytes = dolphin.read_bytes(LAST_RECV_ITEM_ADDR, 4)
+                    last_recv_idx = int.from_bytes(ram_bytes, "big")
+                except Exception as e:
+                    logger.warning(f"Failed to read saveable index from RAM: {e}")
+                    last_recv_idx = 0
 
-            # Otherwise, allocate items since last save
-            self.last_received_idx = last_recv_idx
-            try:
-                non_save_bytes = dolphin.read_bytes(NOT_SAVE_LAST_RECV_ITEM_ADDR, 4)
-                self.non_save_last_recv_idx = int.from_bytes(non_save_bytes, "big")
-            except Exception as e:
-                logger.warning(f"Failed to read non-saveable index from RAM: {e}")
-                self.non_save_last_recv_idx = 0
+                # If true, we have no items to account for
+                if len(self.items_received) == last_recv_idx:
+                    return
 
-            # Get only new items since last save
-            recv_items = self.items_received[last_recv_idx:]
+                # Otherwise, allocate items since last save
+                self.last_received_idx = last_recv_idx
+                try:
+                    non_save_bytes = dolphin.read_bytes(NOT_SAVE_LAST_RECV_ITEM_ADDR, 4)
+                    self.non_save_last_recv_idx = int.from_bytes(non_save_bytes, "big")
+                except Exception as e:
+                    logger.warning(f"Failed to read non-saveable index from RAM: {e}")
+                    self.non_save_last_recv_idx = 0
 
-            # Process each new item
-            for item_to_add in recv_items:
-                last_recv_idx += 1
+                # Get only new items since last save
+                recv_items = self.items_received[last_recv_idx:]
 
-                item_name = self.item_names.lookup_in_game(item_to_add.item)
-                #logger.print(item_name)
-                item_info = ALL_ITEMS_TABLE.get(item_name)
-                #logger.print(item_info)
-                # Sort as parts or not
-                #item_type = item_info.type
-                #player_name = self.slot_to_player_name[item_to_add.player]
-                #print(f"Received item: {item_name} from {player_name}.")
-                #logger.info("Recieved new item, updating memory")
-                if item_info:
-                    item_type = item_info.type
-                    # TODO add in Rahu Evolution
-                    if item_type == "Body" or item_type == "Gun" or item_type == "Bomb" or item_type == "Pod" or item_type == "Legs" or item_type == "Rahu Part":
-                        location_edit = "Use " + item_name
-                        # Write location BEFORE item gain to enable the check
-                        # logger.print("Writing to drop location in memory...")
-                        usage_loc = LOCATION_TABLE[location_edit].ram_addr.ram_addr
-                        usage_byte = bytes_to_int(dolphin.read_bytes(usage_loc, 1))
-                        usage_flag = LOCATION_TABLE[location_edit].ram_addr.bit_position
-                        usage_mesh = int_to_bytes(usage_byte | (1 << usage_flag), 1)
-                        # Calculate matching item gain and assign simultaneously
-                        item_loc = item_info.update_ram_addr[0].ram_addr
-                        item_byte = bytes_to_int(dolphin.read_bytes(item_loc, 1))
-                        item_flag = item_info.update_ram_addr[0].bit_position
-                        item_mesh = int_to_bytes(item_byte | (1 << item_flag), 1)
-                        # Write to memory
-                        dolphin.write_bytes(usage_loc, usage_mesh)
-                        dolphin.write_bytes(item_loc, item_mesh)
-                else:
-                    print(f"Error: Could not find type information for item ID {item_to_add.item}.")
+                # Process each new item
+                for item_to_add in recv_items:
+                    last_recv_idx += 1
 
+                    item_name = self.item_names.lookup_in_game(item_to_add.item)
+                    #logger.print(item_name)
+                    item_info = ALL_ITEMS_TABLE.get(item_name)
+                    #logger.print(item_info)
+                    # Sort as parts or not
+                    #item_type = item_info.type
+                    #player_name = self.slot_to_player_name[item_to_add.player]
+                    #print(f"Received item: {item_name} from {player_name}.")
+                    #logger.info("Received new item, updating memory")
+                    if item_info:
+                        item_type = item_info.type
+                        # TODO add in Rahu Evolution
+                        if item_type == "Body" or item_type == "Gun" or item_type == "Bomb" or item_type == "Pod" or item_type == "Legs" or item_type == "Rahu Part":
+                            location_edit = "Use " + item_name
+                            # Write location BEFORE item gain to enable the check
+                            # logger.print("Writing to drop location in memory...")
+                            usage_loc = LOCATION_TABLE[location_edit].ram_addr.ram_addr
+                            usage_byte = bytes_to_int(dolphin.read_bytes(usage_loc, 1))
+                            usage_flag = LOCATION_TABLE[location_edit].ram_addr.bit_position
+                            usage_mesh = int_to_bytes(usage_byte | (1 << usage_flag), 1)
+                            # Calculate matching item gain and assign simultaneously
+                            item_loc = item_info.update_ram_addr[0].ram_addr
+                            item_byte = bytes_to_int(dolphin.read_bytes(item_loc, 1))
+                            item_flag = item_info.update_ram_addr[0].bit_position
+                            item_mesh = int_to_bytes(item_byte | (1 << item_flag), 1)
+                            # Write to memory
+                            dolphin.write_bytes(usage_loc, usage_mesh)
+                            dolphin.write_bytes(item_loc, item_mesh)
+                    else:
+                        print(f"Error: Could not find type information for item ID {item_to_add.item}.")
+
+                    self.update_received_index(last_recv_idx)
+                    continue
                 self.update_received_index(last_recv_idx)
-                continue
-            self.update_received_index(last_recv_idx)
 
 
     async def server_auth(self, password_requested: bool = False):
