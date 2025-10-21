@@ -10,7 +10,7 @@ from worlds.LauncherComponents import launch_subprocess, Component, components, 
 
 # Relative Imports
 from .helpers import *
-from .items import ALL_ITEMS_TABLE, CRItem, FILLER_ITEMS, COMPLETION_CONDITIONS
+from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE, CRItem, FILLER_ITEMS, COMPLETION_CONDITIONS
 from .locations import CRLocation, LOCATION_TABLE, RAHU_DEFEATED
 from .options import *
 from .rules import *
@@ -82,11 +82,41 @@ class CRWorld(World):
     def create_items(self):
         starting_parts = []
         item_pool = []
-        for item_name, item_data in ALL_ITEMS_TABLE.items():
-            if item_name == "Glory" or item_name == "Gatling Gun" or item_name == "Standard Bomb" or item_name == "Standard Pod" or item_name == "Standard Legs":
-                starting_parts.append(self.create_item(item_name))
-            else: 
-                item_pool.append(self.create_item(item_name))
+        # Standard Starting Parts
+        if self.options.starting_parts.value == self.options.starting_parts.option_standard:
+            print("Standard selected")
+            for item_name, item_data in PARTS_ITEM_TABLE.items():
+                #if item_data.illegal == False | self.options.illegal_parts_enabled.value:
+                if (item_name == "Ray 01" or item_name == "Basic Gun" or item_name == "Standard Bomb"
+                        or item_name == "Standard Pod" or item_name == "Standard Legs"):
+                    starting_parts.append(self.create_item(item_name))
+                else:
+                    item_pool.append(self.create_item(item_name))
+        # Random Starting Parts
+        elif self.options.starting_parts.value == self.options.starting_parts.option_randomized:
+            print("Random selected")
+            body_list = []
+            gun_list = []
+            bomb_list = []
+            pod_list = []
+            legs_list = []
+            for item_name, item_data in PARTS_ITEM_TABLE.items():
+                if item_data.type == "Body": body_list.append(item_name)
+                elif item_data.type == "Gun": gun_list.append(item_name)
+                elif item_data.type == "Bomb": bomb_list.append(item_name)
+                elif item_data.type == "Pod": pod_list.append(item_name)
+                elif item_data.type == "Legs": legs_list.append(item_name)
+            start_body = body_list[random.randint(0, (len(body_list)-1))]
+            start_gun = gun_list[random.randint(0, (len(gun_list)-1))]
+            start_bomb = bomb_list[random.randint(0, (len(bomb_list)-1))]
+            start_pod = pod_list[random.randint(0, (len(pod_list)-1))]
+            start_legs = legs_list[random.randint(0, (len(legs_list)-1))]
+            for item_name, item_data in PARTS_ITEM_TABLE.items():
+                if (item_name == start_body or item_name == start_gun or item_name == start_bomb
+                        or item_name == start_pod or item_name == start_legs):
+                    starting_parts.append(self.create_item(item_name))
+                else:
+                    item_pool.append(self.create_item(item_name))
 
         # Pre-collect all starting parts, then send the rest to the multiworld
         for initial_part in starting_parts:
@@ -138,5 +168,7 @@ class CRWorld(World):
     def fill_slot_data(self):
         return {
             "seed": self.multiworld.seed,
+            "illegal_parts_enabled": self.options.illegal_parts_enabled.value,
+            "starting_parts": self.options.starting_parts.value,
             "total_locations": len(LOCATION_TABLE)
         }

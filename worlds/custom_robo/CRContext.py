@@ -225,7 +225,6 @@ class CRContext(CommonContext):
                     last_recv_idx += 1
 
                     item_name = self.item_names.lookup_in_game(item_to_add.item)
-                    #logger.print(item_name)
                     item_info = ALL_ITEMS_TABLE.get(item_name)
                     #logger.print(item_info)
                     # Sort as parts or not
