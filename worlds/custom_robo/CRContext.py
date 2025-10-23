@@ -13,7 +13,7 @@ import dolphin_memory_engine as dolphin
 # Relative imports
 from .CRClient import CRCommandProcessor
 from .helpers import *
-from .locations import PART_USE, LOCATION_TABLE
+from .locations import BATTLE_TABLE, LOCATION_TABLE, BATTLE_COUNTER_ADDR
 from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE
 
 from worlds.tww.TWWClient import read_string
@@ -130,23 +130,32 @@ class CRContext(CommonContext):
             dolphin.write_bytes(0x803BF9D7, int_to_bytes(0xFF, 1))
             #self.parts_not_suppressed = False
 
+        battle_wins = bytes_to_int(dolphin.read_bytes(BATTLE_COUNTER_ADDR, 1))
         local_missing_locations = copy.deepcopy(self.missing_locations)
         for missing_locations in local_missing_locations:
             local_location_name = self.location_names.lookup_in_game(missing_locations)
-            # Check if part has been used
             cr_local_data = LOCATION_TABLE[local_location_name]
-            location_value = bytes_to_int(dolphin.read_bytes(cr_local_data.ram_addr.ram_addr, 1))
-            location_value_flag = (location_value & (1 << cr_local_data.ram_addr.bit_position)) > 0
-            # Check if part has been obtained
-            obtained_part_name = ALL_ITEMS_TABLE.get(local_location_name[4:])
-            obtained_part_addr = obtained_part_name.update_ram_addr[0]
-            obtained_part_value = bytes_to_int(dolphin.read_bytes(obtained_part_addr.ram_addr, 1))
-            obtained_part_flag = (obtained_part_value & (1 << obtained_part_addr.bit_position)) > 0
-            if (not location_value_flag) & obtained_part_flag:
-                #logger.info(f"Location Value: {location_value} and Obtained Part Address: {obtained_part_addr}")
-                #logger.info(f"Ram Location accessed: {obtained_part.ram_addr} at Bit Location: {obtained_part.bit_position}")
-                #logger.info(str(dolphin.read_bytes(obtained_part.ram_addr, 8)))
-                self.locations_checked.add(missing_locations)
+            match cr_local_data.type:
+                case "Part Use":
+                    # Check if part has been used
+                    location_value = bytes_to_int(dolphin.read_bytes(cr_local_data.ram_addr.ram_addr, 1))
+                    location_value_flag = (location_value & (1 << cr_local_data.ram_addr.bit_position)) > 0
+                    # Check if part has been obtained
+                    obtained_part_name = ALL_ITEMS_TABLE.get(local_location_name[4:])
+                    obtained_part_addr = obtained_part_name.update_ram_addr[0]
+                    obtained_part_value = bytes_to_int(dolphin.read_bytes(obtained_part_addr.ram_addr, 1))
+                    obtained_part_flag = (obtained_part_value & (1 << obtained_part_addr.bit_position)) > 0
+                    if (not location_value_flag) & obtained_part_flag:
+                        #logger.info(f"Location Value: {location_value} and Obtained Part Address: {obtained_part_addr}")
+                        #logger.info(f"Ram Location accessed: {obtained_part.ram_addr} at Bit Location: {obtained_part.bit_position}")
+                        #logger.info(str(dolphin.read_bytes(obtained_part.ram_addr, 8)))
+                        self.locations_checked.add(missing_locations)
+                case "Battle Win":
+                    # Check if we've defeated the opponent yet
+                    if cr_local_data.battle_number <= battle_wins:
+                        self.locations_checked.add(missing_locations)
+
+
 
         await self.check_locations(self.locations_checked)
         # Locations Checked is LOCAL locations in game
