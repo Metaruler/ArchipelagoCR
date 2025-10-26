@@ -10,7 +10,7 @@ from worlds.LauncherComponents import launch_subprocess, Component, components, 
 
 # Relative Imports
 from .helpers import *
-from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE, CRItem, FILLER_ITEMS, COMPLETION_CONDITIONS
+from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE, CRItem, FILLER_ITEMS, COMPLETION_CONDITIONS, PROGRESSIVE_BASE_ITEM_TABLE, PROGRESSION_RAHU
 from .locations import CRLocation, LOCATION_TABLE, RAHU_DEFEATED
 from .options import *
 from .rules import *
@@ -117,6 +117,11 @@ class CRWorld(World):
                     starting_parts.append(self.create_item(item_name))
                 else:
                     item_pool.append(self.create_item(item_name))
+
+        # Add all Rahu Evolution progression parts to the pool
+        rahu_evo_total = len(PROGRESSION_RAHU.get("Rahu Evolution Steps"))
+        for _ in range(rahu_evo_total):
+            item_pool.append(self.create_item("Rahu Evolution"))
 
         # Pre-collect all starting parts, then send the rest to the multiworld
         for initial_part in starting_parts:

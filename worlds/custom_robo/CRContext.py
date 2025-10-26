@@ -14,7 +14,7 @@ import dolphin_memory_engine as dolphin
 from .CRClient import CRCommandProcessor
 from .helpers import *
 from .locations import BATTLE_TABLE, LOCATION_TABLE, BATTLE_COUNTER_ADDR
-from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE
+from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE, PROGRESSION_RAHU
 
 from worlds.tww.TWWClient import read_string
 from ..oot.Messages import bytes_to_int, int_to_bytes
@@ -244,7 +244,7 @@ class CRContext(CommonContext):
                     if item_info:
                         item_type = item_info.type
                         # TODO add in Rahu Evolution
-                        if item_type == "Body" or item_type == "Gun" or item_type == "Bomb" or item_type == "Pod" or item_type == "Legs" or item_type == "Rahu Part":
+                        if item_type == "Body" or item_type == "Gun" or item_type == "Bomb" or item_type == "Pod" or item_type == "Legs":
                             location_edit = "Use " + item_name
                             # Write location BEFORE item gain to enable the check
                             # logger.print("Writing to drop location in memory...")
@@ -260,6 +260,27 @@ class CRContext(CommonContext):
                             # Write to memory
                             dolphin.write_bytes(usage_loc, usage_mesh)
                             dolphin.write_bytes(item_loc, item_mesh)
+                        elif item_type == "Progressive Rahu":
+                            # Rahu Evolution item code = 8194
+                            rahu_count: int = len([netItem for netItem in self.items_received if netItem.item == 8194])
+                            rahu_piece = PROGRESSION_RAHU.get("Rahu Evolution Steps")[rahu_count-1]
+
+                            location_edit = "Use " + rahu_piece.name
+                            # Write location BEFORE item gain to enable the check
+                            # logger.print("Writing to drop location in memory...")
+                            usage_loc = LOCATION_TABLE[location_edit].ram_addr.ram_addr
+                            usage_byte = bytes_to_int(dolphin.read_bytes(usage_loc, 1))
+                            usage_flag = LOCATION_TABLE[location_edit].ram_addr.bit_position
+                            usage_mesh = int_to_bytes(usage_byte | (1 << usage_flag), 1)
+                            # Calculate matching item gain and assign simultaneously
+                            item_loc = rahu_piece.update_ram_addr[0].ram_addr
+                            item_byte = bytes_to_int(dolphin.read_bytes(item_loc, 1))
+                            item_flag = rahu_piece.update_ram_addr[0].bit_position
+                            item_mesh = int_to_bytes(item_byte | (1 << item_flag), 1)
+                            # Write to memory
+                            dolphin.write_bytes(usage_loc, usage_mesh)
+                            dolphin.write_bytes(item_loc, item_mesh)
+
                     else:
                         print(f"Error: Could not find type information for item ID {item_to_add.item}.")
 

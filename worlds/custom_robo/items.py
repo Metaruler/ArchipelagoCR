@@ -3,6 +3,8 @@ from typing import NamedTuple, Optional
 from BaseClasses import Item
 from BaseClasses import ItemClassification as IC
 from .helpers import CRRamData
+from ..ror2.items import classification
+
 
 # Item Class
 class CRItemData(NamedTuple):
@@ -1261,16 +1263,27 @@ PARTS_ITEM_TABLE: dict[str, CRItemData] = {
     classification=IC.useful,
     update_ram_addr=[CRRamData(0x803BFC1E, bit_position=6)],
     illegal=True
-  )
+  ),
+}
+
+# Base items used to trigger Progressive advance
+PROGRESSIVE_BASE_ITEM_TABLE: dict[str, CRItemData] = {
+    "Rahu Evolution" : CRItemData(
+        type="Progressive Rahu",
+        code = 194,
+        classification=IC.useful,
+        update_ram_addr=None,
+        illegal=True
+    )
 }
 
 # Rahu evolution table
 PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
-  "Rahu Evolution": [
+  "Rahu Evolution Steps": [
     CRItemData(
       name="Rahu I",
       type="Rahu Part",
-      code=194,
+      code=None,
       classification=IC.useful,
       update_ram_addr=[CRRamData(0x803BFB9C, bit_position=6)],
       illegal=True
@@ -1278,7 +1291,7 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
     CRItemData(
       name="Penumbra I Pod",
       type="Rahu Part",
-      code=195,
+      code=None,
       classification=IC.useful,
       update_ram_addr=[CRRamData(0x803BFC02, bit_position=1)],
       illegal=True
@@ -1286,7 +1299,7 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
     CRItemData(
       name="Rahu I Gun",
       type="Rahu Part",
-      code=196,
+      code=None,
       classification=IC.useful,
       update_ram_addr=[CRRamData(0x803BFBC1, bit_position=1)],
       illegal=True
@@ -1294,7 +1307,7 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
     CRItemData(
       name="Rahu II",
       type="Rahu Part",
-      code=197,
+      code=None,
       classification=IC.useful,
       update_ram_addr=[CRRamData(0x803BFB9C, bit_position=7)],
       illegal=True
@@ -1302,7 +1315,7 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
     CRItemData(
       name="Penumbra II Pod",
       type="Rahu Part",
-      code=198,
+      code=None,
       classification=IC.useful,
       update_ram_addr=[CRRamData(0x803BFC02, bit_position=2)],
       illegal=True
@@ -1310,7 +1323,7 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
     CRItemData(
       name="Rahu II Gun",
       type="Rahu Part",
-      code=199,
+      code=None,
       classification=IC.useful,
       update_ram_addr=[CRRamData(0x803BFBC1, bit_position=2)],
       illegal=True
@@ -1318,7 +1331,7 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
     CRItemData(
       name="Grand Cross Bomb",
       type="Rahu Part",
-      code=200,
+      code=None,
       classification=IC.useful,
       update_ram_addr=[CRRamData(0x803BFBE2, bit_position=0)],
       illegal=True
@@ -1326,7 +1339,7 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
     CRItemData(
       name="Ultimate Legs",
       type="Rahu Part",
-      code=201,
+      code=None,
       classification=IC.useful,
       update_ram_addr=[CRRamData(0x803BFC1E, bit_position=7)],
       illegal=True
@@ -1334,7 +1347,7 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
     CRItemData(
       name="Rahu III",
       type="Rahu Part",
-      code=202,
+      code=None,
       classification=IC.useful,
       update_ram_addr=[CRRamData(0x803BFBA3, bit_position=0)],
       illegal=True
@@ -1342,7 +1355,7 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
     CRItemData(
       name="Penumbra III Pod",
       type="Rahu Part",
-      code=203,
+      code=None,
       classification=IC.useful,
       update_ram_addr=[CRRamData(0x803BFC02, bit_position=3)],
       illegal=True
@@ -1350,7 +1363,7 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
     CRItemData(
       name="Rahu III Gun",
       type="Rahu Part",
-      code=204,
+      code=None,
       classification=IC.useful,
       update_ram_addr=[CRRamData(0x803BFBC1, bit_position=3)],
       illegal=True
@@ -1379,6 +1392,7 @@ COMPLETION_CONDITIONS: dict[str, CRItemData] = {
 ALL_ITEMS_TABLE = {
 # **PROGRESSION_SCENARIO_TABLE,
   **PARTS_ITEM_TABLE,
-  **{item.name: item for item_list in PROGRESSION_RAHU.values() for item in item_list},
+  **PROGRESSIVE_BASE_ITEM_TABLE,
+  **{item.name: item for item_list in PROGRESSION_RAHU.values() for item in item_list}, # Needed for location checks
   **FILLER_ITEMS
 }
