@@ -173,7 +173,7 @@ class CRWorld(World):
     def fill_slot_data(self):
         return {
             "seed": self.multiworld.seed,
-            "illegal_parts_enabled": self.options.illegal_parts_enabled.value,
+#            "illegal_parts_enabled": self.options.illegal_parts_enabled.value,
             "starting_parts": self.options.starting_parts.value,
             "total_locations": len(LOCATION_TABLE)
         }

@@ -1345,14 +1345,6 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
       illegal=True
     ),
     CRItemData(
-      name="Rahu III",
-      type="Rahu Part",
-      code=None,
-      classification=IC.useful,
-      update_ram_addr=[CRRamData(0x803BFBA3, bit_position=0)],
-      illegal=True
-    ),
-    CRItemData(
       name="Penumbra III Pod",
       type="Rahu Part",
       code=None,
@@ -1368,6 +1360,14 @@ PROGRESSION_RAHU: dict[str, list[CRItemData]] = {
       update_ram_addr=[CRRamData(0x803BFBC1, bit_position=3)],
       illegal=True
     ),
+    CRItemData(
+      name="Rahu III",
+      type="Rahu Part",
+      code=None,
+      classification=IC.useful,
+      update_ram_addr=[CRRamData(0x803BFBA3, bit_position=0)],
+      illegal=True
+    )
   ]
 }
 

@@ -243,7 +243,6 @@ class CRContext(CommonContext):
                     #logger.info("Received new item, updating memory")
                     if item_info:
                         item_type = item_info.type
-                        # TODO add in Rahu Evolution
                         if item_type == "Body" or item_type == "Gun" or item_type == "Bomb" or item_type == "Pod" or item_type == "Legs":
                             location_edit = "Use " + item_name
                             # Write location BEFORE item gain to enable the check
@@ -261,8 +260,10 @@ class CRContext(CommonContext):
                             dolphin.write_bytes(usage_loc, usage_mesh)
                             dolphin.write_bytes(item_loc, item_mesh)
                         elif item_type == "Progressive Rahu":
-                            # Rahu Evolution item code = 8194
-                            rahu_count: int = len([netItem for netItem in self.items_received if netItem.item == 8194])
+                            # Rahu Evolution item code = 194
+                            # KNOWN ISSUE: Receiving multiple Rahu Evolution parts in a single step will cause skipping
+                            # to occur over previous parts
+                            rahu_count: int = len([netItem for netItem in self.items_received if netItem.item == 194])
                             rahu_piece = PROGRESSION_RAHU.get("Rahu Evolution Steps")[rahu_count-1]
 
                             location_edit = "Use " + rahu_piece.name
