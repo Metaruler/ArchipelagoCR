@@ -1189,259 +1189,259 @@ BATTLE_TABLE: dict[str, CRLocationData] = {
         type = "Battle Win",
         battle_number = 31
     ),
-    "Battle #32": CRLocationData(
+    "Chapter 9 - VS Police Officer Duo": CRLocationData(
         code=218,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 32
     ),
-    "Battle #33": CRLocationData(
+    "Chapter 9 - VS Walt & Carmen": CRLocationData(
         code=219,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 33
     ),
-    "Battle #34": CRLocationData(
+    "Chapter 9 - VS Bogey & Waiter": CRLocationData(
         code=220,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 34
     ),
-    "Battle #35": CRLocationData(
+    "Chapter 9 - VS Mira & Roy": CRLocationData(
         code=221,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 35
     ),
-    "Battle #36": CRLocationData(
+    "Chapter 9 - VS Evil": CRLocationData(
         code=222,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 36
     ),
-    "Battle #37": CRLocationData(
+    "Chapter 9 - VS Linda & Ernest": CRLocationData(
         code=223,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 37
     ),
-    "Battle #38": CRLocationData(
+    "Chapter 10 - VS Police Officer #1": CRLocationData(
         code=224,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 38
     ),
-    "Battle #39": CRLocationData(
+    "Chapter 10 - VS Police Officer #2": CRLocationData(
         code=225,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 39
     ),
-    "Battle #40": CRLocationData(
+    "Chapter 10 - VS Linda": CRLocationData(
         code=226,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 40
     ),
-    "Battle #41": CRLocationData(
+    "Chapter 10 - VS Roy": CRLocationData(
         code=227,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 41
     ),
-    "Battle #42": CRLocationData(
+    "Chapter 10 - VS Mira": CRLocationData(
         code=228,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 42
     ),
-    "Battle #43": CRLocationData(
+    "Chapter 10 - VS Police Chief": CRLocationData(
         code=229,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 43
     ),
-    "Battle #44": CRLocationData(
+    "Chapter 10 - VS S-Rank Computer": CRLocationData(
         code=230,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 44
     ),
-    "Battle #45": CRLocationData(
+    "Chapter 11 - VS Eliza(?)": CRLocationData(
         code=231,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 45
     ),
-    "Battle #46": CRLocationData(
+    "Chapter 11 - VS Oboro & Sergei": CRLocationData(
         code=232,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 46
     ),
-    "Battle #47": CRLocationData(
+    "Chapter 12 - VS Z Lackey #1": CRLocationData(
         code=233,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 47
     ),
-    "Battle #48": CRLocationData(
+    "Chapter 12 - VS Shiner": CRLocationData(
         code=234,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 48
     ),
-    "Battle #49": CRLocationData(
+    "Chapter 12 - VS Z Lackey #2": CRLocationData(
         code=235,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 49
     ),
-    "Battle #50": CRLocationData(
+    "Chapter 12 - VS Z Lackey #3": CRLocationData(
         code=236,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 50
     ),
-    "Battle #51": CRLocationData(
+    "Chapter 12 - VS Z Lackey #4": CRLocationData(
         code=237,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 51
     ),
-    "Battle #52": CRLocationData(
+    "Chapter 12 - VS Z Tech #1": CRLocationData(
         code=238,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 52
     ),
-    "Battle #53": CRLocationData(
+    "Chapter 12 - VS Z Tech #2": CRLocationData(
         code=239,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 53
     ),
-    "Battle #54": CRLocationData(
+    "Chapter 12 - VS Z Lackey Duo #1": CRLocationData(
         code=240,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 54
     ),
-    "Battle #55": CRLocationData(
+    "Chapter 12 - VS Z Lackey Duo #2": CRLocationData(
         code=241,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 55
     ),
-    "Battle #56": CRLocationData(
+    "Chapter 12 - VS Oboro": CRLocationData(
         code=242,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 56
     ),
-    "Battle #57": CRLocationData(
+    "Chapter 12 - VS Rahu II": CRLocationData(
         code=243,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 57
     ),
-    "Battle #58": CRLocationData(
+    "Chapter 13 - VS Z Lackey": CRLocationData(
         code=244,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 58
     ),
-    "Battle #59": CRLocationData(
+    "Chapter 13 - VS Z Lackey Duo": CRLocationData(
         code=245,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 59
     ),
-    "Battle #60": CRLocationData(
+    "Chapter 13 - Amusement Battle 3": CRLocationData(
         code=246,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 60
     ),
-    "Battle #61": CRLocationData(
+    "Chapter 13 - Amusement Battle 4": CRLocationData(
         code=247,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 61
     ),
-    "Battle #62": CRLocationData(
+    "Chapter 13 - Amusement Battle 5": CRLocationData(
         code=248,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 62
     ),
-    "Battle #63": CRLocationData(
+    "Chapter 13 - Amusement Battle 6": CRLocationData(
         code=249,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 63
     ),
-    "Battle #64": CRLocationData(
+    "Chapter 13 - Amusement Battle 7": CRLocationData(
         code=250,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 64
     ),
-    "Battle #65": CRLocationData(
+    "Chapter 13 - Amusement Battle 8": CRLocationData(
         code=251,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 65
     ),
-    "Battle #66": CRLocationData(
+    "Chapter 13 - Amusement Battle 9": CRLocationData(
         code=252,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 66
     ),
-    "Battle #67": CRLocationData(
+    "Chapter 13 - Amusement Battle 10": CRLocationData(
         code=253,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 67
     ),
-    "Battle #68": CRLocationData(
+    "Chapter 13 - Amusement Battle 11": CRLocationData(
         code=254,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 68
     ),
-    "Battle #69": CRLocationData(
+    "Chapter 13 - Amusement Battle 12": CRLocationData(
         code=255,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 69
     ),
-    "Battle #70": CRLocationData(
+    "Chapter 13 - Amusement Battle 13": CRLocationData(
         code=256,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 70
     ),
-    "Battle #71": CRLocationData(
+    "Chapter 13 - Amusement Battle 14": CRLocationData(
         code=257,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 71
     ),
-    "Battle #72": CRLocationData(
+    "Chapter 13 - Amusement Battle 15": CRLocationData(
         code=258,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 72
     ),
-    "Battle #73": CRLocationData(
+    "Chapter 13 - Amusement Battle 16": CRLocationData(
         code=259,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",
         battle_number = 73
     ),
-    "Battle #74": CRLocationData(
+    "Chapter 13 - Amusement Battle 17": CRLocationData(
         code=260,
         ram_addr=CRRamData(BATTLE_COUNTER_ADDR, bit_position=1, ram_byte_size=8),
         type = "Battle Win",

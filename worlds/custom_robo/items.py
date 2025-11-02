@@ -3,7 +3,6 @@ from typing import NamedTuple, Optional
 from BaseClasses import Item
 from BaseClasses import ItemClassification as IC
 from .helpers import CRRamData
-from ..ror2.items import classification
 
 
 # Item Class

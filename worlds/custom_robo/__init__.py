@@ -129,7 +129,7 @@ class CRWorld(World):
         self.multiworld.itempool.extend(item_pool)
 
         location_count = len(self.multiworld.get_unfilled_locations(self.player))
-        items_in_pool = len(self.multiworld.itempool)
+        items_in_pool = len(item_pool)
         filler_needed = location_count - items_in_pool
 
         filler_items_to_add = random.choices(list(FILLER_ITEMS.keys()), k=filler_needed)
