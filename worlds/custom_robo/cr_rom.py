@@ -173,7 +173,7 @@ class CRUSAPatch(APPatch, metaclass=AutoPatchRegister):
 
 def get_base_rom_path() -> str:
     options: Settings = get_settings()
-    file_name = (options.get("custom_robo_options", "")).get("iso_file", "")
+    file_name = (options.get("custom_robo_options", {})).get("iso_file", "")
     if not os.path.exists(file_name):
         file_name = Utils.user_path(file_name)
     return file_name
