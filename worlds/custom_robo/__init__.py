@@ -151,7 +151,7 @@ class CRWorld(World):
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Defeat Rahu III", self.player)
 
   
-        # Output options, locations and doors for patcher
+    # Output options and locations for patcher
     def generate_output(self, output_directory: str):
         # Outputs the plando details to our expected output file
         # Create the output path based on the current player + expected patch file ending.

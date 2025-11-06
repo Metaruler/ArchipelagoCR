@@ -51,7 +51,12 @@ every game in your `custom_worlds` and `lib/worlds` folder. You can manually edi
 4. Click upload file and pass it the .zip created in your output folder
 5. Click the "Create New Room" link.
 6. Run the ArchipelagoLauncher.exe and click `Open Patch`. Select your `.apcr` patch file.
-You will be prompted to locate your Custom Robo (USA) ISO the first time you do this.
+You will be prompted to locate your Custom Robo (USA) ISO the first time you do this. If this does NOT happen, you will have to open your host.yaml and add the following:
+    ```
+    custom_robo_options:
+    # Locate the user's Custom Robo USA ISO file.
+    iso_file: "D:/Dolphin/AP Roms/Custom Robo (USA).iso" (replace with your path to CR ISO)
+    ```
    - This action will AUTOMATICALLY run the Custom Robo Client (and connect to the webhost if the patch was downloaded from there).
    - The patch will be placed in the same folder as your patch file by default.
    - You will ***not*** need to patch the game every time, and can simply run the `CRClient` from the list on the right of the Archipelago Launcher

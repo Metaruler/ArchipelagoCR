@@ -21,11 +21,13 @@ from ..oot.Messages import bytes_to_int, int_to_bytes
 
 WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
 
-# Current assumption is that these are unused, will need to change if this is untrue
+# Unused memory in-game that will hold our item counters
 LAST_RECV_ITEM_ADDR = 0x803BFB8E
 NOT_SAVE_LAST_RECV_ITEM_ADDR = 0x803BFB92
+
 GAME_STARTED_ADDR = 0x803BF933 # Location that changes to 116 whenever loaded into a file
-DROP_TRIGGER_TOGGLE_ADDR = 0x803BFBEA # Location used to do memory clear logic
+DROP_TRIGGER_TOGGLE_ADDR = 0x803BFBEA # Location used to do memory clear logic (Bit 2)
+RAHU_INDEX_ADDR = 0x803BFBEA # Stores at bit locations 3-6
 
 #--------------------------------------------------------------------
 #Context for CR
@@ -263,8 +265,10 @@ class CRContext(CommonContext):
                             # Rahu Evolution item code = 194
                             # KNOWN ISSUE: Receiving multiple Rahu Evolution parts in a single step will cause skipping
                             # to occur over previous parts
-                            rahu_count: int = len([netItem for netItem in self.items_received if netItem.item == 194])
-                            rahu_piece = PROGRESSION_RAHU.get("Rahu Evolution Steps")[rahu_count-1]
+                            # rahu_count: int = len([netItem for netItem in self.items_received if netItem.item == 194])
+                            rahu_origin = bytes_to_int(dolphin.read_bytes(RAHU_INDEX_ADDR, 1))
+                            rahu_count = (rahu_origin >> 2)
+                            rahu_piece = PROGRESSION_RAHU.get("Rahu Evolution Steps")[rahu_count]
 
                             location_edit = "Use " + rahu_piece.name
                             # Write location BEFORE item gain to enable the check
@@ -281,7 +285,9 @@ class CRContext(CommonContext):
                             # Write to memory
                             dolphin.write_bytes(usage_loc, usage_mesh)
                             dolphin.write_bytes(item_loc, item_mesh)
-
+                            rahu_count += 1
+                            rahu_index = int_to_bytes(((rahu_count << 2) + (rahu_origin & 0b00000011)), 1)
+                            dolphin.write_bytes(RAHU_INDEX_ADDR, rahu_index)
                     else:
                         print(f"Error: Could not find type information for item ID {item_to_add.item}.")
 
@@ -353,8 +359,8 @@ class CRContext(CommonContext):
                         continue
 
                     arg_seed = read_string(0x80000001, len(str(self.arg_seed)))
-                    logger.info("Seed in memory: " + arg_seed)
-                    logger.info("Seed in Context: " + self.arg_seed)
+                    # logger.info("Seed in memory: " + arg_seed)
+                    # logger.info("Seed in Context: " + self.arg_seed)
                     if arg_seed != self.arg_seed:
                         raise Exception(
                             "Incorrect Custom Robo ISO file selected. The seed does not match." +
