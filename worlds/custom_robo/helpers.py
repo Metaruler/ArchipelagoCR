@@ -2,7 +2,7 @@ from typing import NamedTuple, Optional
 import asyncio
 
 CLIENT_NAME = "Custom Robo"
-CLIENT_VERSION = "v0.1.1"
+CLIENT_VERSION = "v0.2"
 
 AP_LOGGER_NAME = "Client"
 AP_WORLD_VERSION_NAME = "APWorldVersion"

@@ -202,7 +202,7 @@ class CRContext(CommonContext):
                     dolphin.write_bytes(0x803BFBC7, mem_zeroes)
                     dolphin.write_bytes(0x803BFBE7, mem_zeroes)
                     dolphin.write_bytes(0x803BFC07, mem_zeroes)
-                    dolphin.write_bytes(0x803BFC1F, mem_zeroes)
+                    dolphin.write_bytes(0x803BFC27, mem_zeroes)
                     toggle_int = bytes_to_int(dolphin.read_bytes(DROP_TRIGGER_TOGGLE_ADDR, 1))
                     item_mesh = int_to_bytes(toggle_int | (1 << 1), 1)
                     dolphin.write_bytes(DROP_TRIGGER_TOGGLE_ADDR, item_mesh)
@@ -267,27 +267,33 @@ class CRContext(CommonContext):
                             # to occur over previous parts
                             # rahu_count: int = len([netItem for netItem in self.items_received if netItem.item == 194])
                             rahu_origin = bytes_to_int(dolphin.read_bytes(RAHU_INDEX_ADDR, 1))
-                            rahu_count = (rahu_origin >> 2)
-                            rahu_piece = PROGRESSION_RAHU.get("Rahu Evolution Steps")[rahu_count]
-
-                            location_edit = "Use " + rahu_piece.name
-                            # Write location BEFORE item gain to enable the check
-                            # logger.print("Writing to drop location in memory...")
-                            usage_loc = LOCATION_TABLE[location_edit].ram_addr.ram_addr
-                            usage_byte = bytes_to_int(dolphin.read_bytes(usage_loc, 1))
-                            usage_flag = LOCATION_TABLE[location_edit].ram_addr.bit_position
-                            usage_mesh = int_to_bytes(usage_byte | (1 << usage_flag), 1)
-                            # Calculate matching item gain and assign simultaneously
-                            item_loc = rahu_piece.update_ram_addr[0].ram_addr
-                            item_byte = bytes_to_int(dolphin.read_bytes(item_loc, 1))
-                            item_flag = rahu_piece.update_ram_addr[0].bit_position
-                            item_mesh = int_to_bytes(item_byte | (1 << item_flag), 1)
-                            # Write to memory
-                            dolphin.write_bytes(usage_loc, usage_mesh)
-                            dolphin.write_bytes(item_loc, item_mesh)
-                            rahu_count += 1
-                            rahu_index = int_to_bytes(((rahu_count << 2) + (rahu_origin & 0b00000011)), 1)
-                            dolphin.write_bytes(RAHU_INDEX_ADDR, rahu_index)
+                            rahu_moder = rahu_origin
+                            rahu_count = (rahu_moder >> 2)
+                            # Prevent out-of-bounds issue when receiving more than the max Rahu parts
+                            if rahu_count < 11:
+                                rahu_piece = PROGRESSION_RAHU.get("Rahu Evolution Steps")[rahu_count]
+                                location_edit = "Use " + rahu_piece.name
+                                # We actually hold the counter for Rahu right next to Grand Cross Bomb's usage flag, so
+                                # the below adjustment is to prevent the game from just instantly giving us the Use check
+                                if rahu_piece.name == "Grand Cross Bomb":
+                                    rahu_origin += 1
+                                # Write location BEFORE item gain to enable the check
+                                # logger.print("Writing to drop location in memory...")
+                                usage_loc = LOCATION_TABLE[location_edit].ram_addr.ram_addr
+                                usage_byte = bytes_to_int(dolphin.read_bytes(usage_loc, 1))
+                                usage_flag = LOCATION_TABLE[location_edit].ram_addr.bit_position
+                                usage_mesh = int_to_bytes(usage_byte | (1 << usage_flag), 1)
+                                # Calculate matching item gain and assign simultaneously
+                                item_loc = rahu_piece.update_ram_addr[0].ram_addr
+                                item_byte = bytes_to_int(dolphin.read_bytes(item_loc, 1))
+                                item_flag = rahu_piece.update_ram_addr[0].bit_position
+                                item_mesh = int_to_bytes(item_byte | (1 << item_flag), 1)
+                                # Write to memory
+                                dolphin.write_bytes(usage_loc, usage_mesh)
+                                dolphin.write_bytes(item_loc, item_mesh)
+                                rahu_count += 1
+                                rahu_index = int_to_bytes(((rahu_count << 2) + (rahu_origin & 0b00000011)), 1)
+                                dolphin.write_bytes(RAHU_INDEX_ADDR, rahu_index)
                     else:
                         print(f"Error: Could not find type information for item ID {item_to_add.item}.")
 

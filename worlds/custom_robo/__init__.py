@@ -43,7 +43,7 @@ class CRWorld(World):
     options_dataclass = CROptions
     options: CROptions
     topology_present = False
-    settings = CRSettings
+    settings: CRSettings
 
     item_name_to_id: ClassVar[dict[str, int]] = {
         name: data.code for name, data in ALL_ITEMS_TABLE.items()

@@ -76,6 +76,8 @@ class CRUSAPatch(APPatch, metaclass=AutoPatchRegister):
         base_path = os.path.splitext(apcr_patch)[0]
         output_file = base_path + self.result_file_ending
 
+        self.__get_remote_dependencies_and_create_iso(apcr_patch, output_file, cr_clean_iso)
+
         try:
             # Check for clean ROM
             self.verify_base_rom(cr_clean_iso, throw_on_missing_speedups=False)
@@ -161,11 +163,10 @@ class CRUSAPatch(APPatch, metaclass=AutoPatchRegister):
             if os.path.isdir(local_dir_path):
                 logger.info("Found temp directory after failing seed generation, deleting %s", local_dir_path)
                 shutil.rmtree(local_dir_path)
-                os.makedirs(local_dir_path, exist_ok=True)
-
-                # Load external dependencies based on OS
-                logger.info("Temporary Directory created as: %s", local_dir_path)
-                self.create_iso(local_dir_path, apcr_patch, output_file, cr_clean_iso)
+            os.makedirs(local_dir_path, exist_ok=True)
+            # Load external dependencies based on OS
+            logger.info("Temporary Directory created as: %s", local_dir_path)
+            self.create_iso(local_dir_path, apcr_patch, output_file, cr_clean_iso)
         except PermissionError:
             logger.warning("Failed to cleanup temp folder, %s ignoring delete.", local_dir_path)
 
@@ -174,6 +175,7 @@ class CRUSAPatch(APPatch, metaclass=AutoPatchRegister):
 def get_base_rom_path() -> str:
     options: Settings = get_settings()
     file_name = (options.get("custom_robo_options", {})).get("iso_file", "")
+    #file_name = options["custom_robo_options"]["iso_file"]
     if not os.path.exists(file_name):
         file_name = Utils.user_path(file_name)
     return file_name
