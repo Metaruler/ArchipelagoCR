@@ -1317,8 +1317,9 @@ COMPLETION_CONDITIONS: dict[str, CRItemData] = {
     "Defeat Rahu III": CRItemData(
         name="Defeat Rahu III",
         type="Completion Item",
-        code=None,
-        classification=IC.progression
+        code=413,
+        classification=IC.progression,
+        update_ram_addr=[CRRamData(0x803BFC02, bit_position=5)]
     )
 }
 
@@ -1327,5 +1328,6 @@ ALL_ITEMS_TABLE = {
   **PARTS_ITEM_TABLE,
   **PROGRESSIVE_BASE_ITEM_TABLE,
   **{item.name: item for item_list in PROGRESSION_RAHU.values() for item in item_list}, # Needed for location checks
-  **FILLER_ITEMS
+  **FILLER_ITEMS,
+  **COMPLETION_CONDITIONS
 }

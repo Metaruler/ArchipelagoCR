@@ -29,6 +29,8 @@ GAME_STARTED_ADDR = 0x803BF933 # Location that changes to 116 whenever loaded in
 DROP_TRIGGER_TOGGLE_ADDR = 0x803BFBEA # Location used to do memory clear logic (Bit 2)
 RAHU_INDEX_ADDR = 0x803BFBEA # Stores at bit locations 3-6
 
+CHAPTER_INDEX_ADDR = 0x803BE7A7
+
 #--------------------------------------------------------------------
 #Context for CR
 class CRContext(CommonContext):
@@ -96,6 +98,12 @@ class CRContext(CommonContext):
         self.dolphin_connected = False
         self.already_fired_events = False
 
+    async def write_bytes_and_validate(self, addr: int, ram_offset: list[str] | None, curr_value: bytes) -> None:
+        if not ram_offset:
+            dolphin.write_bytes(addr, curr_value)
+        else:
+            dolphin.write_bytes(dolphin.follow_pointers(addr, ram_offset), curr_value)
+
     def update_received_index(self, last_recov_idx: int):
         """
         This will write the current item index to saveable and non-saveable RAM address using 4 byte write
@@ -116,6 +124,7 @@ class CRContext(CommonContext):
                 dolphin.write_bytes(NOT_SAVE_LAST_RECV_ITEM_ADDR, byte_data)
             except Exception as e:
                 logger.info(f"Error writing 4-byte index to NOT SAVE LAST RECOV ITEM")
+
 
     async def game_watcher(self):
         """
@@ -168,20 +177,41 @@ class CRContext(CommonContext):
         if not self.finished_game:
             try:
                 # Get the RAM data for the final scene in the New Journey scenario. This is our "beating the game".
-                scenario_ram_data = LOCATION_TABLE.get("Rahu III Defeated").ram_addr
+                # Read the value at the event's memory address.
+                boss_defeated_value = dolphin.read_bytes(CHAPTER_INDEX_ADDR, 1)[0]
 
-                if scenario_ram_data:
-                    # Read the value at the event's memory address.
-                    boss_defeated_value = dolphin.read_bytes(scenario_ram_data.ram_addr, 1)[0]
+                # Check if the bit for defeating Rahu is set.
+                if boss_defeated_value == 18:
+                    rahu_item_name = "Defeated Rahu III"
+                    rahu_item_info = ALL_ITEMS_TABLE.get(rahu_item_name)
 
-                    # Check if the bit for defeating Rahu is set.
-                    if boss_defeated_value == 18:
-                        print("Final boss defeated! Signaling game completion to the server.")
-                        self.finished_game = True # Ends loop on next pass
-                        await self.send_msgs([{
-                            "cmd": "StatusUpdate",
-                            "status": NetUtils.ClientStatus.CLIENT_GOAL,
-                        }])
+                    # Ensure item data exists
+                    if rahu_item_info and rahu_item_info.update_ram_addr and len(rahu_item_info.update_ram_addr) > 0:
+                        addr_to_update = rahu_item_info.update_ram_addr[0]
+                        ram_addr = addr_to_update.ram_addr
+                        bit_position = addr_to_update.bit_position
+                        byte_size = 1
+
+                        # Read current value
+                        curr_val = int.from_bytes(dolphin.read_bytes(ram_addr, byte_size), 'big')
+
+                        # Apply the item's bit-set effect
+                        new_val = (curr_val | (1 << bit_position))
+
+                        # Write the new value back to RAM
+                        await self.write_bytes_and_validate(
+                            ram_addr, None, new_val.to_bytes(byte_size, 'big')
+                        )
+                    else:
+                        logger.error("Rahu defeat item data not found or misconfigured, cannot grant item for goal.")
+
+                    # Display victory on the log then send victory ping to multiworld server
+                    print("Final boss defeated! Signaling game completion to the server.")
+                    self.finished_game = True # Ends loop on next pass
+                    await self.send_msgs([{
+                        "cmd": "StatusUpdate",
+                        "status": NetUtils.ClientStatus.CLIENT_GOAL,
+                    }])
             except Exception as e:
                 # This will catch errors if the game state is not readable or the address is invalid.
                 print(f"Error checking for game completion: {e}")

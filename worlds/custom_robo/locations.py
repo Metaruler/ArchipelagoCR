@@ -1522,6 +1522,12 @@ BATTLE_TABLE: dict[str, CRLocationData] = {
         battle_number = 74,
         parent_region = "Chapter 13 - Rahu's Amusement"
     ),
+    "Rahu III Defeated": CRLocationData(
+        code=400,
+        ram_addr=CRRamData(0x803BFC02, bit_position=5),
+        type = "Victory",
+        parent_region="Chapter 13 - Rahu's Amusement"
+    )
 }
 
 #CHAPTER_COUNTER: dict[str, CRLocationData] = {
@@ -1531,18 +1537,10 @@ BATTLE_TABLE: dict[str, CRLocationData] = {
 #   )
 #}
 
-RAHU_DEFEATED: dict[str, CRLocationData] = {
-   "Rahu III Defeated": CRLocationData(
-      code=None,
-      ram_addr=CRRamData(0x803BE7A7, bit_position=0, ram_byte_size=8)
-   )
-}
-
 LOCATION_TABLE: dict[str, CRLocationData] = {
   **PART_USE,
   **BATTLE_TABLE,
 #  **CHAPTER_COUNTER,
-  **RAHU_DEFEATED
 }
 
 #SELF_LOCATIONS_TO_RECV: list[int] = [

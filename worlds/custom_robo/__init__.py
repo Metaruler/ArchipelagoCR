@@ -11,7 +11,7 @@ from worlds.LauncherComponents import launch_subprocess, Component, components, 
 # Relative Imports
 from .helpers import *
 from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE, CRItem, FILLER_ITEMS, COMPLETION_CONDITIONS, PROGRESSIVE_BASE_ITEM_TABLE, PROGRESSION_RAHU
-from .locations import CRLocation, LOCATION_TABLE, RAHU_DEFEATED
+from .locations import CRLocation, LOCATION_TABLE
 from .options import *
 from .rules import *
 from .cr_rom import CRPlayerContainer
@@ -116,6 +116,16 @@ class CRWorld(World):
                     region
                 )
                 region.locations.append(location)
+            else:
+                if location_data.type == "Victory":
+                    region = self.multiworld.get_region(location_data.parent_region, self.player)
+                    location = Location(
+                        self.player,
+                        location_name,
+                        location_data.code,
+                        region
+                    )
+                    region.locations.append(location)
 
 
     def generate_basic(self):
@@ -144,6 +154,8 @@ class CRWorld(World):
             self.create_item("Chapter 11 Memories"))
         self.multiworld.get_location("Chapter 12 - VS Rahu II", self.player).place_locked_item(
             self.create_item("Chapter 12 Memories"))
+        self.multiworld.get_location("Rahu III Defeated", self.player).place_locked_item(
+            self.create_item("Defeat Rahu III"))
 
     def create_items(self):
         starting_parts = []
@@ -196,7 +208,7 @@ class CRWorld(World):
 
         location_count = len(self.multiworld.get_unfilled_locations(self.player))
         items_in_pool = len(item_pool)
-        filler_needed = location_count - items_in_pool - 12 # Used to subtract Memory items
+        filler_needed = location_count - items_in_pool - 13 # Used to subtract Memory items & Boss defeated value
 
         filler_items_to_add = random.choices(list(FILLER_ITEMS.keys()), k=filler_needed)
 
