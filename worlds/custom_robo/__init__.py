@@ -156,6 +156,7 @@ class CRWorld(World):
             self.create_item("Chapter 12 Memories"))
         self.multiworld.get_location("Rahu III Defeated", self.player).place_locked_item(
             self.create_item("Defeat Rahu III"))
+        self.multiworld.completion_condition[self.player] = lambda state: state.has("Defeat Rahu III", self.player)
 
     def create_items(self):
         starting_parts = []

@@ -86,7 +86,7 @@ class CRContext(CommonContext):
 
         match cmd:
             case "Connected":
-                self.arg_seed = str(slot_data["seed"])
+                self.arg_seed = "CR" + str(slot_data["seed"])
                 self.game_running = True
 
     async def disconnect(self, allow_autoreconnect = False):
@@ -399,7 +399,7 @@ class CRContext(CommonContext):
                     # logger.info("Seed in Context: " + self.arg_seed)
                     if arg_seed != self.arg_seed:
                         raise Exception(
-                            "Incorrect Custom Robo ISO file selected. The seed does not match." +
+                            "Incorrect Custom Robo ISO file selected. The seed does not match. " +
                             "Please verify that you are using the right ISO/seed/apcr file.")
 
                 await self.game_watcher()

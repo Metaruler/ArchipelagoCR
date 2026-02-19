@@ -50,7 +50,7 @@ class CRPatcher:
 
         logger.info("Updating the ISO game id with the AP generated seed.")
         self.seed = self.output_data["Seed"]
-        magic_seed = str(self.seed)
+        magic_seed = "CR" + str(self.seed)
         print("Magic Seed is :" + magic_seed)
         bin_data = self.gcm.read_file_data("sys/boot.bin")
         # Seek will put us right after the first letter G of the Disk ID
