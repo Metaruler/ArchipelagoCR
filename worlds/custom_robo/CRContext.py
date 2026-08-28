@@ -13,7 +13,7 @@ import dolphin_memory_engine as dolphin
 # Relative imports
 from .CRClient import CRCommandProcessor
 from .helpers import *
-from .locations import BATTLE_TABLE, LOCATION_TABLE, BATTLE_COUNTER_ADDR
+from .locations import BATTLE_TABLE, LOCATION_TABLE, BATTLE_COUNTER_ADDR, CHAPTER_COUNTER_ADDR
 from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE, PROGRESSION_RAHU
 
 from worlds.tww.TWWClient import read_string
@@ -47,6 +47,7 @@ class CRContext(CommonContext):
     already_fired_events = False
     game_running = False
     parts_not_suppressed = True
+    stored_chapter = 0
 
     item_id_to_name: Dict[int, str]
     slot_to_player_name: Dict[int, str]
@@ -140,6 +141,10 @@ class CRContext(CommonContext):
         if bytes_to_int(dolphin.read_bytes(0x803BF9D7, 1)) != 0xFF:
             dolphin.write_bytes(0x803BF9D7, int_to_bytes(0xFF, 1))
             #self.parts_not_suppressed = False
+        current_chapter = bytes_to_int(dolphin.read_bytes(CHAPTER_COUNTER_ADDR, 1))
+        if self.stored_chapter != current_chapter:
+            dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
+            self.stored_chapter = current_chapter
 
         battle_wins = bytes_to_int(dolphin.read_bytes(BATTLE_COUNTER_ADDR, 1))
         local_missing_locations = copy.deepcopy(self.missing_locations)
@@ -163,7 +168,7 @@ class CRContext(CommonContext):
                         self.locations_checked.add(missing_locations)
                 case "Battle Win":
                     # Check if we've defeated the opponent yet
-                    if cr_local_data.battle_number <= battle_wins:
+                    if cr_local_data.parent_ch == self.stored_chapter and cr_local_data.battle_number <= battle_wins:
                         self.locations_checked.add(missing_locations)
 
 
