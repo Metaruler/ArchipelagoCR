@@ -44,6 +44,7 @@ class CRWorld(World):
     options: CROptions
     topology_present = False
     settings: CRSettings
+    chapter_order = [1]
 
     item_name_to_id: ClassVar[dict[str, int]] = {
         name: data.code for name, data in ALL_ITEMS_TABLE.items()
@@ -75,12 +76,7 @@ class CRWorld(World):
             "Chapter 9 - Police 2v2": "Chapter 9 Memories",
             "Chapter 10 - Secret Police": "Chapter 10 Memories",
             "Chapter 11 - Rahu Returns": "Chapter 11 Memories",
-            "Chapter 12 - To The Outside": "Dad's Watch",
-            "Chapter 13 - Rahu's Amusement": "Dad's Watch"
         }
-
-        # TODO Shuffle chapter order if desired
-
         menu_region = Region("Menu", self.player, self.multiworld)
 
         # Part Checks are always accessible with the correct Part, so add all to Menu region
@@ -97,14 +93,37 @@ class CRWorld(World):
         self.multiworld.regions.append(menu_region)
         self.multiworld.regions.append(chapter_1_region)
         menu_region.connect(chapter_1_region)
-
         previous_region = chapter_1_region
+
+        # Shuffle chapter order if desired
+        shuffled_region_names = list(region_data.keys())
+        random.shuffle(shuffled_region_names)
         # Create regions from all other chapters
-        for region_name, access_condition in region_data.items():
+        for region_name in shuffled_region_names:
+            access_condition = region_data.get(region_name)
             new_region = Region(region_name, self.player, self.multiworld)
             self.multiworld.regions.append(new_region)
+            match region_name:
+                case "Chapter 2 - Test Hall Trials": self.chapter_order.append(2)
+                case "Chapter 3 - License Test": self.chapter_order.append(3)
+                case "Chapter 4 - Family Matters": self.chapter_order.append(4)
+                case "Chapter 5 - Shiner Style": self.chapter_order.append(5)
+                case "Chapter 6 - Gym Tourney": self.chapter_order.append(6)
+                case "Chapter 7 - Lab Guard Duty": self.chapter_order.append(7)
+                case "Chapter 8 - Rahu Appears": self.chapter_order.append(8)
+                case "Chapter 9 - Police 2v2": self.chapter_order.append(9)
+                case "Chapter 10 - Secret Police": self.chapter_order.append(10)
+                case "Chapter 11 - Rahu Returns": self.chapter_order.append(11)
             previous_region.connect(new_region, rule=lambda state, access_mem=access_condition: state.has(access_mem, self.player))
             previous_region = new_region
+        # Manually add the last regions to prevent shuffle
+        new_region = Region("Chapter 12 - To The Outside", self.player, self.multiworld)
+        self.multiworld.regions.append(new_region)
+        previous_region.connect(new_region, rule=lambda state, access_mem="Dad's Watch": state.has(access_mem, self.player))
+        previous_region = new_region
+        new_region = Region("Chapter 13 - Rahu's Amusement", self.player, self.multiworld)
+        self.multiworld.regions.append(new_region)
+        previous_region.connect(new_region, rule=lambda state, access_mem="Dad's Watch": state.has(access_mem, self.player))
 
         # Add each battle location to the correct Chapter
         for location_name, location_data in LOCATION_TABLE.items():
@@ -247,7 +266,8 @@ class CRWorld(World):
             "Slot": self.player,
             "Name": self.player_name,
             "Locations": {},
-            "APWorldVersion": CLIENT_VERSION
+            "APWorldVersion": CLIENT_VERSION,
+            "ChapterOrder": self.chapter_order
         }
         # Create a zip (container) that will contain all the necessary output files for us to use during patching.
         cr_container = CRPlayerContainer(output_data, patch_path, self.multiworld.player_name[self.player], self.player)

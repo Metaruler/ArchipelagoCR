@@ -62,12 +62,13 @@ class CRPatcher:
         # Write the Seed into the Disk ID to make it unique to multiworld
         bin_data.write(sbf.string_to_bytes(magic_seed, len(magic_seed)))
 
+        chapter_order = self.output_data["ChapterOrder"]
         # Write shuffled chapter numbers into ROM data
-        bin_data.write(int_to_bytes(2, 1))
-        bin_data.write(int_to_bytes(3, 1))
-        bin_data.write(int_to_bytes(4, 1))
-        bin_data.write(int_to_bytes(5, 1))
-        bin_data.write(int_to_bytes(6, 1))
+        bin_data.write(int_to_bytes(chapter_order[1], 1))
+        bin_data.write(int_to_bytes(chapter_order[2], 1))
+        bin_data.write(int_to_bytes(chapter_order[3], 1))
+        bin_data.write(int_to_bytes(chapter_order[4], 1))
+        bin_data.write(int_to_bytes(chapter_order[5], 1))
 #        bin_data.write(int_to_bytes(7, 1))
 #        bin_data.write(int_to_bytes(8, 1))
 #        bin_data.write(int_to_bytes(9, 1))
