@@ -32,77 +32,82 @@ class CRItem(Item):
       return base_id + code if code is not None else None
 
 # Begin item list for AP
-# Items indicating chapter completion
+# Items indicating chapter unlocks
 SCENARIO_TABLE: dict[str, CRItemData] = {
-    "Chapter 1 Memories": CRItemData(
-        type="Chapter Clear",
-        code=401,
-        classification=IC.progression,
-        update_ram_addr=[]
-    ),
     "Chapter 2 Memories": CRItemData(
-        type="Chapter Clear",
-        code=402,
+        name="Chapter 2 Memories",
+        type="Chapter Access",
+        code=502,
         classification=IC.progression,
         update_ram_addr=[]
     ),
     "Chapter 3 Memories": CRItemData(
-        type="Chapter Clear",
-        code=403,
+        name="Chapter 3 Memories",
+        type="Chapter Access",
+        code=503,
         classification=IC.progression,
         update_ram_addr=[]
     ),
     "Chapter 4 Memories": CRItemData(
-        type="Chapter Clear",
-        code=404,
+        name="Chapter 4 Memories",
+        type="Chapter Access",
+        code=504,
         classification=IC.progression,
         update_ram_addr=[]
     ),
     "Chapter 5 Memories": CRItemData(
-        type="Chapter Clear",
-        code=405,
+        name="Chapter 5 Memories",
+        type="Chapter Access",
+        code=505,
         classification=IC.progression,
         update_ram_addr=[]
     ),
     "Chapter 6 Memories": CRItemData(
-        type="Chapter Clear",
-        code=406,
+        name="Chapter 6 Memories",
+        type="Chapter Access",
+        code=506,
         classification=IC.progression,
         update_ram_addr=[]
     ),
     "Chapter 7 Memories": CRItemData(
-        type="Chapter Clear",
-        code=407,
+        name="Chapter 7 Memories",
+        type="Chapter Access",
+        code=507,
         classification=IC.progression,
         update_ram_addr=[]
     ),
     "Chapter 8 Memories": CRItemData(
-        type="Chapter Clear",
-        code=408,
+        name="Chapter 8 Memories",
+        type="Chapter Access",
+        code=508,
         classification=IC.progression,
         update_ram_addr=[]
     ),
     "Chapter 9 Memories": CRItemData(
-        type="Chapter Clear",
-        code=409,
+        name="Chapter 9 Memories",
+        type="Chapter Access",
+        code=509,
         classification=IC.progression,
         update_ram_addr=[]
     ),
     "Chapter 10 Memories": CRItemData(
-        type="Chapter Clear",
-        code=410,
+        name="Chapter 10 Memories",
+        type="Chapter Access",
+        code=510,
         classification=IC.progression,
         update_ram_addr=[]
     ),
     "Chapter 11 Memories": CRItemData(
-        type="Chapter Clear",
-        code=411,
+        name="Chapter 11 Memories",
+        type="Chapter Access",
+        code=511,
         classification=IC.progression,
         update_ram_addr=[]
     ),
-    "Chapter 12 Memories": CRItemData(
-        type="Chapter Clear",
-        code=412,
+    "Dad's Watch": CRItemData(
+        name="Dad's Watch",
+        type="Chapter Access",
+        code=512,
         classification=IC.progression,
         update_ram_addr=[]
     )
@@ -1207,6 +1212,12 @@ PROGRESSIVE_BASE_ITEM_TABLE: dict[str, CRItemData] = {
         classification=IC.progression,
         update_ram_addr=None,
         illegal=True
+    ),
+    "Hero's Memories" : CRItemData(
+        type="Progressive Memories",
+        code=404,
+        classification=IC.progression,
+        update_ram_addr=None
     )
 }
 

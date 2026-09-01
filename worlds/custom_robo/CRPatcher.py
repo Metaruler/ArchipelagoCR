@@ -2,6 +2,7 @@ import os
 import json
 import struct
 import zipfile
+from urllib.parse import to_bytes
 
 from gclib.gcm import GCM
 from gclib.dol import DOL
@@ -11,6 +12,7 @@ import Utils
 from .items import ALL_ITEMS_TABLE, CRItemData
 from .locations import LOCATION_TABLE, CRLocationData
 from .helpers import CLIENT_VERSION, AP_WORLD_VERSION_NAME, StringByteFunction as sbf
+from ..oot.Messages import bytes_to_int, int_to_bytes
 from CommonClient import logger
 
 from ..oot.Messages import bytes_to_int
@@ -59,6 +61,19 @@ class CRPatcher:
         #bin_data.write(sbf.string_to_bytes("MT", 2))
         # Write the Seed into the Disk ID to make it unique to multiworld
         bin_data.write(sbf.string_to_bytes(magic_seed, len(magic_seed)))
+
+        # Write shuffled chapter numbers into ROM data
+        bin_data.write(int_to_bytes(2, 1))
+        bin_data.write(int_to_bytes(3, 1))
+        bin_data.write(int_to_bytes(4, 1))
+        bin_data.write(int_to_bytes(5, 1))
+        bin_data.write(int_to_bytes(6, 1))
+#        bin_data.write(int_to_bytes(7, 1))
+#        bin_data.write(int_to_bytes(8, 1))
+#        bin_data.write(int_to_bytes(9, 1))
+#        bin_data.write(int_to_bytes(10, 1))
+#        bin_data.write(int_to_bytes(11, 1))
+
         self.gcm.changed_files["sys/boot.bin"] = bin_data
 
     def write_item_to_location(self, location_name: str, item_name: str):

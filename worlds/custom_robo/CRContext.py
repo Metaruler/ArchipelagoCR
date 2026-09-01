@@ -141,6 +141,13 @@ class CRContext(CommonContext):
         if bytes_to_int(dolphin.read_bytes(0x803BF9D7, 1)) != 0xFF:
             dolphin.write_bytes(0x803BF9D7, int_to_bytes(0xFF, 1))
             #self.parts_not_suppressed = False
+
+        # Chapter shuffle logic
+#        match self.stored_chapter:
+#            case 0:
+
+
+        # Reset Chapter battles for proper counting (MUST BE DONE AFTER CHAPTER ALTERATION)
         current_chapter = bytes_to_int(dolphin.read_bytes(CHAPTER_COUNTER_ADDR, 1))
         if self.stored_chapter != current_chapter:
             dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))

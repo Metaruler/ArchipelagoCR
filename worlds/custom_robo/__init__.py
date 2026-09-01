@@ -10,7 +10,7 @@ from worlds.LauncherComponents import launch_subprocess, Component, components, 
 
 # Relative Imports
 from .helpers import *
-from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE, CRItem, FILLER_ITEMS, COMPLETION_CONDITIONS, PROGRESSIVE_BASE_ITEM_TABLE, PROGRESSION_RAHU
+from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE, CRItem, FILLER_ITEMS, COMPLETION_CONDITIONS, PROGRESSIVE_BASE_ITEM_TABLE, PROGRESSION_RAHU, SCENARIO_TABLE
 from .locations import CRLocation, LOCATION_TABLE
 from .options import *
 from .rules import *
@@ -65,19 +65,21 @@ class CRWorld(World):
         # Add all regions
         chapter_1_region = Region("Chapter 1 - Steel Hearts", self.player, self.multiworld)
         region_data = {
-            "Chapter 2 - Test Hall Trials": "Chapter 1 Memories",
-            "Chapter 3 - License Test": "Chapter 2 Memories",
-            "Chapter 4 - Family Matters": "Chapter 3 Memories",
-            "Chapter 5 - Shiner Style": "Chapter 4 Memories",
-            "Chapter 6 - Gym Tourney": "Chapter 5 Memories",
-            "Chapter 7 - Lab Guard Duty": "Chapter 6 Memories",
-            "Chapter 8 - Rahu Appears": "Chapter 7 Memories",
-            "Chapter 9 - Police 2v2": "Chapter 8 Memories",
-            "Chapter 10 - Secret Police": "Chapter 9 Memories",
-            "Chapter 11 - Rahu Returns": "Chapter 10 Memories",
-            "Chapter 12 - To The Outside": "Chapter 11 Memories",
-            "Chapter 13 - Rahu's Amusement": "Chapter 12 Memories",
+            "Chapter 2 - Test Hall Trials": "Chapter 2 Memories",
+            "Chapter 3 - License Test": "Chapter 3 Memories",
+            "Chapter 4 - Family Matters": "Chapter 4 Memories",
+            "Chapter 5 - Shiner Style": "Chapter 5 Memories",
+            "Chapter 6 - Gym Tourney": "Chapter 6 Memories",
+            "Chapter 7 - Lab Guard Duty": "Chapter 7 Memories",
+            "Chapter 8 - Rahu Appears": "Chapter 8 Memories",
+            "Chapter 9 - Police 2v2": "Chapter 9 Memories",
+            "Chapter 10 - Secret Police": "Chapter 10 Memories",
+            "Chapter 11 - Rahu Returns": "Chapter 11 Memories",
+            "Chapter 12 - To The Outside": "Dad's Watch",
+            "Chapter 13 - Rahu's Amusement": "Dad's Watch"
         }
+
+        # TODO Shuffle chapter order if desired
 
         menu_region = Region("Menu", self.player, self.multiworld)
 
@@ -101,7 +103,6 @@ class CRWorld(World):
         for region_name, access_condition in region_data.items():
             new_region = Region(region_name, self.player, self.multiworld)
             self.multiworld.regions.append(new_region)
-
             previous_region.connect(new_region, rule=lambda state, access_mem=access_condition: state.has(access_mem, self.player))
             previous_region = new_region
 
@@ -130,30 +131,30 @@ class CRWorld(World):
 
     def generate_basic(self):
         # Set New Journey chapter clear items to organize AP World progression
-        self.multiworld.get_location("Chapter 1 - VS Bandit #4", self.player).place_locked_item(
-            self.create_item("Chapter 1 Memories"))
-        self.multiworld.get_location("Chapter 2 - VS Thomas/Anthony", self.player).place_locked_item(
-            self.create_item("Chapter 2 Memories"))
-        self.multiworld.get_location("Chapter 3 - VS Test Computer", self.player).place_locked_item(
-            self.create_item("Chapter 3 Memories"))
-        self.multiworld.get_location("Chapter 4 - VS Walt & Carmen", self.player).place_locked_item(
-            self.create_item("Chapter 4 Memories"))
-        self.multiworld.get_location("Chapter 5 - VS Shiner", self.player).place_locked_item(
-            self.create_item("Chapter 5 Memories"))
-        self.multiworld.get_location("Chapter 6 - VS Marcia", self.player).place_locked_item(
-            self.create_item("Chapter 6 Memories"))
-        self.multiworld.get_location("Chapter 7 - VS Eliza", self.player).place_locked_item(
-            self.create_item("Chapter 7 Memories"))
-        self.multiworld.get_location("Chapter 8 - VS Sergei", self.player).place_locked_item(
-            self.create_item("Chapter 8 Memories"))
-        self.multiworld.get_location("Chapter 9 - VS Linda & Ernest", self.player).place_locked_item(
-            self.create_item("Chapter 9 Memories"))
-        self.multiworld.get_location("Chapter 10 - VS S-Rank Computer", self.player).place_locked_item(
-            self.create_item("Chapter 10 Memories"))
-        self.multiworld.get_location("Chapter 11 - VS Oboro & Sergei", self.player).place_locked_item(
-            self.create_item("Chapter 11 Memories"))
-        self.multiworld.get_location("Chapter 12 - VS Rahu II", self.player).place_locked_item(
-            self.create_item("Chapter 12 Memories"))
+        #self.multiworld.get_location("Chapter 1 - VS Bandit #4", self.player).place_locked_item(
+        #    self.create_item("Chapter 1 Memories"))
+        #self.multiworld.get_location("Chapter 2 - VS Thomas/Anthony", self.player).place_locked_item(
+        #    self.create_item("Chapter 2 Memories"))
+        #self.multiworld.get_location("Chapter 3 - VS Test Computer", self.player).place_locked_item(
+        #    self.create_item("Chapter 3 Memories"))
+        #self.multiworld.get_location("Chapter 4 - VS Walt & Carmen", self.player).place_locked_item(
+        #    self.create_item("Chapter 4 Memories"))
+        #self.multiworld.get_location("Chapter 5 - VS Shiner", self.player).place_locked_item(
+        #    self.create_item("Chapter 5 Memories"))
+        #self.multiworld.get_location("Chapter 6 - VS Marcia", self.player).place_locked_item(
+        #    self.create_item("Chapter 6 Memories"))
+        #self.multiworld.get_location("Chapter 7 - VS Eliza", self.player).place_locked_item(
+        #    self.create_item("Chapter 7 Memories"))
+        #self.multiworld.get_location("Chapter 8 - VS Sergei", self.player).place_locked_item(
+        #    self.create_item("Chapter 8 Memories"))
+        #self.multiworld.get_location("Chapter 9 - VS Linda & Ernest", self.player).place_locked_item(
+        #    self.create_item("Chapter 9 Memories"))
+        #self.multiworld.get_location("Chapter 10 - VS S-Rank Computer", self.player).place_locked_item(
+        #    self.create_item("Chapter 10 Memories"))
+        #self.multiworld.get_location("Chapter 11 - VS Oboro & Sergei", self.player).place_locked_item(
+        #    self.create_item("Chapter 11 Memories"))
+        #self.multiworld.get_location("Chapter 12 - VS Rahu II", self.player).place_locked_item(
+        #    self.create_item("Dad's Watch"))
         self.multiworld.get_location("Rahu III Defeated", self.player).place_locked_item(
             self.create_item("Defeat Rahu III"))
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Defeat Rahu III", self.player)
@@ -202,6 +203,10 @@ class CRWorld(World):
         for _ in range(rahu_evo_total):
             item_pool.append(self.create_item("Rahu Evolution"))
 
+        # Add all Memory progression items to the pool
+        for memory_name, memory_data in SCENARIO_TABLE.items():
+            item_pool.append((self.create_item(memory_name)))
+
         # Pre-collect all starting parts, then send the rest to the multiworld
         for initial_part in starting_parts:
             self.multiworld.push_precollected(initial_part)
@@ -209,7 +214,7 @@ class CRWorld(World):
 
         location_count = len(self.multiworld.get_unfilled_locations(self.player))
         items_in_pool = len(item_pool)
-        filler_needed = location_count - items_in_pool - 13 # Used to subtract Memory items & Boss defeated value
+        filler_needed = location_count - items_in_pool - 1 # Used to subtract Boss defeated value
 
         filler_items_to_add = random.choices(list(FILLER_ITEMS.keys()), k=filler_needed)
 
