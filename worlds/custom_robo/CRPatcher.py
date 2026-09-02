@@ -64,16 +64,24 @@ class CRPatcher:
 
         chapter_order = self.output_data["ChapterOrder"]
         # Write shuffled chapter numbers into ROM data
-        bin_data.write(int_to_bytes(chapter_order[1], 1))
-        bin_data.write(int_to_bytes(chapter_order[2], 1))
-        bin_data.write(int_to_bytes(chapter_order[3], 1))
-        bin_data.write(int_to_bytes(chapter_order[4], 1))
-        bin_data.write(int_to_bytes(chapter_order[5], 1))
-#        bin_data.write(int_to_bytes(7, 1))
-#        bin_data.write(int_to_bytes(8, 1))
-#        bin_data.write(int_to_bytes(9, 1))
-#        bin_data.write(int_to_bytes(10, 1))
-#        bin_data.write(int_to_bytes(11, 1))
+
+        chapter_bytes: list[bytes] = []
+        chap_to_write: int = 0
+        alternator: bool = True
+        # This function will arrange the chapters to be read by the client later
+        for chapter in chapter_order:
+            if alternator:
+                chap_to_write = chap_to_write | (chapter << 4)
+                alternator = False
+            else:
+                chap_to_write = chap_to_write | chapter
+                chapter_bytes.append(int_to_bytes(chap_to_write, 1))
+                chap_to_write = 0
+                alternator = True
+
+        # After arranging, write the bytes into memory
+        for chap_byte in chapter_bytes:
+            bin_data.write(chap_byte)
 
         self.gcm.changed_files["sys/boot.bin"] = bin_data
 
