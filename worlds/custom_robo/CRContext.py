@@ -13,7 +13,7 @@ import dolphin_memory_engine as dolphin
 # Relative imports
 from .CRClient import CRCommandProcessor
 from .helpers import *
-from .locations import BATTLE_TABLE, LOCATION_TABLE, BATTLE_COUNTER_ADDR, CHAPTER_COUNTER_ADDR
+from .locations import BATTLE_TABLE, LOCATION_TABLE, BATTLE_COUNTER_ADDR, CHAPTER_COUNTER_ADDR, PROG_FLAG_1_ADDR, PROG_FLAG_2_ADDR, PROG_FLAG_3_ADDR, PROG_FLAG_4_ADDR
 from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE, PROGRESSION_RAHU
 
 from worlds.tww.TWWClient import read_string
@@ -47,7 +47,7 @@ class CRContext(CommonContext):
     already_fired_events = False
     game_running = False
     parts_not_suppressed = True
-    stored_chapter = 0
+    stored_chapter = -1 # This will prevent us from constantly flipping new chapter flags
 
     item_id_to_name: Dict[int, str]
     slot_to_player_name: Dict[int, str]
@@ -248,6 +248,16 @@ class CRContext(CommonContext):
                     toggle_int = bytes_to_int(dolphin.read_bytes(DROP_TRIGGER_TOGGLE_ADDR, 1))
                     item_mesh = int_to_bytes(toggle_int | (1 << 1), 1)
                     dolphin.write_bytes(DROP_TRIGGER_TOGGLE_ADDR, item_mesh)
+
+                # Chapter & Flag adjustment logic (also controls access to Chapters)
+                not_yet_set = bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) == 0
+                match current_chapter:
+                    case 0:
+                        if not_yet_set:
+                            dolphin.write_bytes(PROG_FLAG_1_ADDR, int_to_bytes(0x07, 1))
+                            dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0xF8, 1))
+                            dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0x08, 1))
+                            self.stored_chapter = current_chapter
 
                 # Check for new items.
                 try:
