@@ -30,6 +30,22 @@ DROP_TRIGGER_TOGGLE_ADDR = 0x803BFBEA # Location used to do memory clear logic (
 RAHU_INDEX_ADDR = 0x803BFBEA # Stores at bit locations 3-6
 
 CHAPTER_INDEX_ADDR = 0x803BE7A7
+CAI_2_7 = 0x803BFBA3 # Chapter accesses for Ch 2-7
+CAI_8_12 = 0x803BFBAB # Chapter accesses for Ch 8-12
+
+CH2_CMP = 0b00000100
+CH3_CMP = 0b00001000
+CH4_CMP = 0b00010000
+CH5_CMP = 0b00100000
+CH6_CMP = 0b01000000
+CH7_CMP = 0b10000000
+CH8_CMP = 0b00000100
+CH9_CMP = 0b00001000
+CH10_CMP = 0b00010000
+CH11_CMP = 0b00100000
+CH12_CMP = 0b01000000
+
+FLAG_DELAY_FRAMES = 60
 
 #--------------------------------------------------------------------
 #Context for CR
@@ -47,7 +63,11 @@ class CRContext(CommonContext):
     already_fired_events = False
     game_running = False
     parts_not_suppressed = True
+    chapters_loaded = False
+    chapter_order = []
     stored_chapter = -1 # This will prevent us from constantly flipping new chapter flags
+    flag_delay_counter = 0 # This counter will give the game enough time to flip the chapter before adjusting flags
+    flag_flip = False
 
     item_id_to_name: Dict[int, str]
     slot_to_player_name: Dict[int, str]
@@ -142,16 +162,33 @@ class CRContext(CommonContext):
             dolphin.write_bytes(0x803BF9D7, int_to_bytes(0xFF, 1))
             #self.parts_not_suppressed = False
 
-        # Chapter shuffle logic
-#        match self.stored_chapter:
-#            case 0:
+        # Load Chapters into array for logic
+        if not self.chapters_loaded:
+            # Chapters are read from patched locations
+            chaps = [
+                bytes_to_int(dolphin.read_bytes(0x80000017, 1)),
+                bytes_to_int(dolphin.read_bytes(0x80000018, 1)),
+                bytes_to_int(dolphin.read_bytes(0x80000019, 1)),
+                bytes_to_int(dolphin.read_bytes(0x8000001A, 1)),
+                bytes_to_int(dolphin.read_bytes(0x8000001B, 1))
+            ]
+            for chap in chaps:
+                self.chapter_order.append(chap >> 4)
+                self.chapter_order.append(chap % 16)
+            self.chapter_order.append(12)
+            self.chapters_loaded = True
 
 
         # Reset Chapter battles for proper counting (MUST BE DONE AFTER CHAPTER ALTERATION)
         current_chapter = bytes_to_int(dolphin.read_bytes(CHAPTER_COUNTER_ADDR, 1))
-        if self.stored_chapter != current_chapter:
-            dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
-            self.stored_chapter = current_chapter
+
+        # Chapter advance logic to control the counter for flipping flags
+        chap_advance = self.stored_chapter + 1 == current_chapter
+        if chap_advance:
+            self.flag_delay_counter += 1
+            if self.flag_delay_counter > FLAG_DELAY_FRAMES:
+                self.flag_flip = True
+                self.flag_delay_counter = 0
 
         battle_wins = bytes_to_int(dolphin.read_bytes(BATTLE_COUNTER_ADDR, 1))
         local_missing_locations = copy.deepcopy(self.missing_locations)
@@ -253,13 +290,344 @@ class CRContext(CommonContext):
                 not_yet_set = bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) == 0
                 match current_chapter:
                     case 0:
-                        if not_yet_set:
+                        if not_yet_set and self.stored_chapter == -1:
                             dolphin.write_bytes(PROG_FLAG_1_ADDR, int_to_bytes(0x07, 1))
                             dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0xF8, 1))
                             dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0x08, 1))
                             self.stored_chapter = current_chapter
+                        # Reset battles before moving to Ch 1
+                        if bytes_to_int(dolphin.read_bytes(PROG_FLAG_1_ADDR, 1)) & 0x08 > 0:
+                            dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
+                    case 1:
+                        if not_yet_set and self.flag_flip:
+                            dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0x04, 1))
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_3_ADDR, 1)) & 0x08 > 0:
+                            chap_count = 0
+                            while self.chapter_order[chap_count] != current_chapter:
+                                chap_count += 1
+                            next_chap = self.chapter_order[chap_count+1]
+                            ob_mem = False # Obtained Memory?
+                            # Check if next chapter is unlocked, otherwise it's GROUNDHOG DAY
+                            match next_chap:
+                                case 1: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7,1)) & CH2_CMP > 0
+                                case 2: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH3_CMP > 0
+                                case 3: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH4_CMP > 0
+                                case 5: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH5_CMP > 0
+                                case 7: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH6_CMP > 0
+                                case 8: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH7_CMP > 0
+                                case 9: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH8_CMP > 0
+                                case 10: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH9_CMP > 0
+                                case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
+                                case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
+                                case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
+                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
+                            dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
+                            self.stored_chapter = next_chap-1
+                    case 2:
+                        if not_yet_set and self.flag_flip:
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) & 0x20 > 0:
+                            chap_count = 0
+                            while self.chapter_order[chap_count] != current_chapter:
+                                chap_count += 1
+                            next_chap = self.chapter_order[chap_count+1]
+                            ob_mem = False # Obtained Memory?
+                            # Check if next chapter is unlocked, otherwise it's GROUNDHOG DAY
+                            match next_chap:
+                                case 1: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7,1)) & CH2_CMP > 0
+                                case 2: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH3_CMP > 0
+                                case 3: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH4_CMP > 0
+                                case 5: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH5_CMP > 0
+                                case 7: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH6_CMP > 0
+                                case 8: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH7_CMP > 0
+                                case 9: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH8_CMP > 0
+                                case 10: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH9_CMP > 0
+                                case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
+                                case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
+                                case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
+                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
+                            dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
+                            self.stored_chapter = next_chap-1
+                    case 3:
+                        if not_yet_set and self.flag_flip:
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                    case 4:
+                        if not_yet_set and self.flag_flip:
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) & 0x01 > 0:
+                            chap_count = 0
+                            while self.chapter_order[chap_count] != current_chapter:
+                                chap_count += 1
+                            next_chap = self.chapter_order[chap_count+1]
+                            ob_mem = False # Obtained Memory?
+                            # Check if next chapter is unlocked, otherwise it's GROUNDHOG DAY
+                            match next_chap:
+                                case 1: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7,1)) & CH2_CMP > 0
+                                case 2: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH3_CMP > 0
+                                case 3: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH4_CMP > 0
+                                case 5: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH5_CMP > 0
+                                case 7: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH6_CMP > 0
+                                case 8: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH7_CMP > 0
+                                case 9: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH8_CMP > 0
+                                case 10: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH9_CMP > 0
+                                case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
+                                case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
+                                case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
+                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
+                            dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
+                            self.stored_chapter = next_chap-1
+                    case 5:
+                        if not_yet_set and self.flag_flip:
+                            dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xE0, 1))
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                    case 6:
+                        if not_yet_set and self.flag_flip:
+                            dolphin.write_bytes(PROG_FLAG_3_ADDR, int_to_bytes(0x08, 1))
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) & 0x08 > 0:
+                            chap_count = 0
+                            while self.chapter_order[chap_count] != current_chapter:
+                                chap_count += 1
+                            next_chap = self.chapter_order[chap_count+1]
+                            ob_mem = False # Obtained Memory?
+                            # Check if next chapter is unlocked, otherwise it's GROUNDHOG DAY
+                            match next_chap:
+                                case 1: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7,1)) & CH2_CMP > 0
+                                case 2: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH3_CMP > 0
+                                case 3: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH4_CMP > 0
+                                case 5: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH5_CMP > 0
+                                case 7: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH6_CMP > 0
+                                case 8: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH7_CMP > 0
+                                case 9: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH8_CMP > 0
+                                case 10: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH9_CMP > 0
+                                case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
+                                case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
+                                case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
+                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
+                            dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
+                            self.stored_chapter = next_chap-1
+                    case 7:
+                        if not_yet_set and self.flag_flip:
+                            dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0x01, 1))
+                            dolphin.write_bytes(PROG_FLAG_3_ADDR, int_to_bytes(0xFF, 1))
+                            dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xE1, 1))
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_3_ADDR, 1)) & 0x10 > 0:
+                            chap_count = 0
+                            while self.chapter_order[chap_count] != current_chapter:
+                                chap_count += 1
+                            next_chap = self.chapter_order[chap_count+1]
+                            ob_mem = False # Obtained Memory?
+                            # Check if next chapter is unlocked, otherwise it's GROUNDHOG DAY
+                            match next_chap:
+                                case 1: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7,1)) & CH2_CMP > 0
+                                case 2: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH3_CMP > 0
+                                case 3: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH4_CMP > 0
+                                case 5: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH5_CMP > 0
+                                case 7: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH6_CMP > 0
+                                case 8: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH7_CMP > 0
+                                case 9: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH8_CMP > 0
+                                case 10: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH9_CMP > 0
+                                case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
+                                case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
+                                case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
+                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
+                            dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
+                            self.stored_chapter = next_chap-1
+                    case 8:
+                        if not_yet_set and self.flag_flip:
+                            dolphin.write_bytes(PROG_FLAG_1_ADDR, int_to_bytes(0x7F, 1))
+                            dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0xFC, 1))
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_2_ADDR, 1)) & 0x01 > 0:
+                            chap_count = 0
+                            while self.chapter_order[chap_count] != current_chapter:
+                                chap_count += 1
+                            next_chap = self.chapter_order[chap_count+1]
+                            ob_mem = False # Obtained Memory?
+                            # Check if next chapter is unlocked, otherwise it's GROUNDHOG DAY
+                            match next_chap:
+                                case 1: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7,1)) & CH2_CMP > 0
+                                case 2: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH3_CMP > 0
+                                case 3: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH4_CMP > 0
+                                case 5: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH5_CMP > 0
+                                case 7: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH6_CMP > 0
+                                case 8: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH7_CMP > 0
+                                case 9: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH8_CMP > 0
+                                case 10: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH9_CMP > 0
+                                case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
+                                case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
+                                case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
+                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
+                            dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
+                            self.stored_chapter = next_chap-1
+                    case 9:
+                        if not_yet_set and self.flag_flip:
+                            dolphin.write_bytes(PROG_FLAG_3_ADDR, int_to_bytes(0x20, 1))
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_3_ADDR, 1)) & 0x02 > 0:
+                            chap_count = 0
+                            while self.chapter_order[chap_count] != current_chapter:
+                                chap_count += 1
+                            next_chap = self.chapter_order[chap_count+1]
+                            ob_mem = False # Obtained Memory?
+                            # Check if next chapter is unlocked, otherwise it's GROUNDHOG DAY
+                            match next_chap:
+                                case 1: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7,1)) & CH2_CMP > 0
+                                case 2: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH3_CMP > 0
+                                case 3: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH4_CMP > 0
+                                case 5: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH5_CMP > 0
+                                case 7: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH6_CMP > 0
+                                case 8: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH7_CMP > 0
+                                case 9: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH8_CMP > 0
+                                case 10: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH9_CMP > 0
+                                case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
+                                case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
+                                case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
+                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
+                            dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
+                            self.stored_chapter = next_chap-1
+                    case 10:
+                        if not_yet_set and self.flag_flip:
+                            dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0x0F, 1))
+                            dolphin.write_bytes(PROG_FLAG_3_ADDR, int_to_bytes(0xFF, 1))
+                            dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xEE, 1))
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_1_ADDR, 1)) & 0x20 > 0:
+                            chap_count = 0
+                            while self.chapter_order[chap_count] != current_chapter:
+                                chap_count += 1
+                            next_chap = self.chapter_order[chap_count+1]
+                            ob_mem = False # Obtained Memory?
+                            # Check if next chapter is unlocked, otherwise it's GROUNDHOG DAY
+                            match next_chap:
+                                case 1: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7,1)) & CH2_CMP > 0
+                                case 2: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH3_CMP > 0
+                                case 3: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH4_CMP > 0
+                                case 5: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH5_CMP > 0
+                                case 7: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH6_CMP > 0
+                                case 8: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH7_CMP > 0
+                                case 9: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH8_CMP > 0
+                                case 10: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH9_CMP > 0
+                                case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
+                                case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
+                                case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
+                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
+                            dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
+                            self.stored_chapter = next_chap-1
+                    case 11:
+                        if not_yet_set and self.flag_flip:
+                            dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0x20, 1))
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                    case 12:
+                        if not_yet_set and self.flag_flip:
+                            dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0x04, 1))
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_2_ADDR, 1)) & 0x01 > 0:
+                            chap_count = 0
+                            while self.chapter_order[chap_count] != current_chapter:
+                                chap_count += 1
+                            next_chap = self.chapter_order[chap_count+1]
+                            ob_mem = False # Obtained Memory?
+                            # Check if next chapter is unlocked, otherwise it's GROUNDHOG DAY
+                            match next_chap:
+                                case 1: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7,1)) & CH2_CMP > 0
+                                case 2: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH3_CMP > 0
+                                case 3: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH4_CMP > 0
+                                case 5: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH5_CMP > 0
+                                case 7: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH6_CMP > 0
+                                case 8: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH7_CMP > 0
+                                case 9: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH8_CMP > 0
+                                case 10: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH9_CMP > 0
+                                case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
+                                case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
+                                case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
+                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
+                            dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
+                            self.stored_chapter = next_chap-1
+                    case 13:
+                        if not_yet_set and self.flag_flip:
+                            dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0x04, 1))
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_3_ADDR, 1)) & 0x80 > 0:
+                            chap_count = 0
+                            while self.chapter_order[chap_count] != current_chapter:
+                                chap_count += 1
+                            next_chap = self.chapter_order[chap_count+1]
+                            ob_mem = False # Obtained Memory?
+                            # Check if next chapter is unlocked, otherwise it's GROUNDHOG DAY
+                            match next_chap:
+                                case 1: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7,1)) & CH2_CMP > 0
+                                case 2: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH3_CMP > 0
+                                case 3: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH4_CMP > 0
+                                case 5: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH5_CMP > 0
+                                case 7: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH6_CMP > 0
+                                case 8: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_2_7, 1)) & CH7_CMP > 0
+                                case 9: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH8_CMP > 0
+                                case 10: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH9_CMP > 0
+                                case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
+                                case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
+                                case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
+                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
+                            dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
+                            self.stored_chapter = next_chap-1
+                    case 14:
+                        if not_yet_set and self.flag_flip:
+                            dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0x04, 1))
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                    case 15:
+                        if not_yet_set and self.flag_flip:
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                    case 16:
+                        if not_yet_set and self.flag_flip:
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                    case 17:
+                        if not_yet_set and self.flag_flip:
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
+                    case 18:
+                        if not_yet_set and self.flag_flip:
+                            self.stored_chapter = current_chapter
+                            self.flag_flip = False
 
-                # Check for new items.
+                    # Check for new items.
                 try:
                     ram_bytes = dolphin.read_bytes(LAST_RECV_ITEM_ADDR, 4)
                     last_recv_idx = int.from_bytes(ram_bytes, "big")
@@ -315,8 +683,6 @@ class CRContext(CommonContext):
                             dolphin.write_bytes(item_loc, item_mesh)
                         elif item_type == "Progressive Rahu":
                             # Rahu Evolution item code = 194
-                            # KNOWN ISSUE: Receiving multiple Rahu Evolution parts in a single step will cause skipping
-                            # to occur over previous parts
                             # rahu_count: int = len([netItem for netItem in self.items_received if netItem.item == 194])
                             rahu_origin = bytes_to_int(dolphin.read_bytes(RAHU_INDEX_ADDR, 1))
                             rahu_moder = rahu_origin
@@ -346,6 +712,42 @@ class CRContext(CommonContext):
                                 rahu_count += 1
                                 rahu_index = int_to_bytes(((rahu_count << 2) + (rahu_origin & 0b00000011)), 1)
                                 dolphin.write_bytes(RAHU_INDEX_ADDR, rahu_index)
+                        elif item_type == "Chapter Access":
+                            # Turn on bits in the part flags to indicate we have access to chapters
+                            match item_name:
+                                case "Chapter 2 Memories":
+                                    dolphin.write_bytes(CAI_2_7, (int_to_bytes((bytes_to_int(dolphin.read_bytes(
+                                        CAI_2_7, 1)) | CH2_CMP), 1)))
+                                case "Chapter 3 Memories":
+                                    dolphin.write_bytes(CAI_2_7, (int_to_bytes((bytes_to_int(dolphin.read_bytes(
+                                        CAI_2_7, 1)) | CH3_CMP), 1)))
+                                case "Chapter 4 Memories":
+                                    dolphin.write_bytes(CAI_2_7, (int_to_bytes((bytes_to_int(dolphin.read_bytes(
+                                        CAI_2_7, 1)) | CH4_CMP), 1)))
+                                case "Chapter 5 Memories":
+                                    dolphin.write_bytes(CAI_2_7, (int_to_bytes((bytes_to_int(dolphin.read_bytes(
+                                        CAI_2_7, 1)) | CH5_CMP), 1)))
+                                case "Chapter 6 Memories":
+                                    dolphin.write_bytes(CAI_2_7, (int_to_bytes((bytes_to_int(dolphin.read_bytes(
+                                        CAI_2_7, 1)) | CH6_CMP), 1)))
+                                case "Chapter 7 Memories":
+                                    dolphin.write_bytes(CAI_2_7, (int_to_bytes((bytes_to_int(dolphin.read_bytes(
+                                        CAI_2_7, 1)) | CH7_CMP), 1)))
+                                case "Chapter 8 Memories":
+                                    dolphin.write_bytes(CAI_8_12, (int_to_bytes((bytes_to_int(dolphin.read_bytes(
+                                        CAI_8_12, 1)) | CH8_CMP), 1)))
+                                case "Chapter 9 Memories":
+                                    dolphin.write_bytes(CAI_8_12, (int_to_bytes((bytes_to_int(dolphin.read_bytes(
+                                        CAI_8_12, 1)) | CH9_CMP), 1)))
+                                case "Chapter 10 Memories":
+                                    dolphin.write_bytes(CAI_8_12, (int_to_bytes((bytes_to_int(dolphin.read_bytes(
+                                        CAI_8_12, 1)) | CH10_CMP), 1)))
+                                case "Chapter 11 Memories":
+                                    dolphin.write_bytes(CAI_8_12, (int_to_bytes((bytes_to_int(dolphin.read_bytes(
+                                        CAI_8_12, 1)) | CH11_CMP), 1)))
+                                case "Dad's Watch":
+                                    dolphin.write_bytes(CAI_8_12, (int_to_bytes((bytes_to_int(dolphin.read_bytes(
+                                        CAI_8_12, 1)) | CH12_CMP), 1)))
                     else:
                         print(f"Error: Could not find type information for item ID {item_to_add.item}.")
 
