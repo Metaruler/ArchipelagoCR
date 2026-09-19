@@ -67,7 +67,10 @@ class CRContext(CommonContext):
     chapter_order = []
     stored_chapter = -1 # This will prevent us from constantly flipping new chapter flags
     flag_delay_counter = 0 # This counter will give the game enough time to flip the chapter before adjusting flags
-    flag_flip = False
+    flag_flip = False # Used to control flags from flipping more than once
+    change_locker = False # Used to control chapters from changing more than once
+    change_locker_switch = False
+    reset_battles = False # Used to ensure we don't miss a battle check
 
     item_id_to_name: Dict[int, str]
     slot_to_player_name: Dict[int, str]
@@ -162,6 +165,9 @@ class CRContext(CommonContext):
             dolphin.write_bytes(0x803BF9D7, int_to_bytes(0xFF, 1))
             #self.parts_not_suppressed = False
 
+        # Reset Chapter battles for proper counting
+        current_chapter = bytes_to_int(dolphin.read_bytes(CHAPTER_COUNTER_ADDR, 1))
+
         # Load Chapters into array for logic
         if not self.chapters_loaded:
             # Chapters are read from patched locations
@@ -175,12 +181,13 @@ class CRContext(CommonContext):
             for chap in chaps:
                 self.chapter_order.append(chap >> 4)
                 self.chapter_order.append(chap % 16)
-            self.chapter_order.append(12)
+            self.chapter_order.append(14)
+            # Set initial stored chapter from last load
+            if current_chapter > 0:
+                self.stored_chapter = current_chapter
+                not_yet_set = bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) == 0
+                if not_yet_set: self.stored_chapter = current_chapter - 1
             self.chapters_loaded = True
-
-
-        # Reset Chapter battles for proper counting (MUST BE DONE AFTER CHAPTER ALTERATION)
-        current_chapter = bytes_to_int(dolphin.read_bytes(CHAPTER_COUNTER_ADDR, 1))
 
         # Chapter advance logic to control the counter for flipping flags
         chap_advance = self.stored_chapter + 1 == current_chapter
@@ -188,7 +195,16 @@ class CRContext(CommonContext):
             self.flag_delay_counter += 1
             if self.flag_delay_counter > FLAG_DELAY_FRAMES:
                 self.flag_flip = True
+                self.change_locker_switch = True
                 self.flag_delay_counter = 0
+        if self.change_locker_switch:
+            self.flag_delay_counter += 1
+            if self.flag_delay_counter > FLAG_DELAY_FRAMES:
+                self.change_locker = False
+                self.change_locker_switch = False
+                self.flag_delay_counter = 0
+
+
 
         battle_wins = bytes_to_int(dolphin.read_bytes(BATTLE_COUNTER_ADDR, 1))
         local_missing_locations = copy.deepcopy(self.missing_locations)
@@ -223,6 +239,8 @@ class CRContext(CommonContext):
 
         #logger.info("Locations checked, checking for endgame")
 
+        if self.reset_battles: dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
+
         if not self.finished_game:
             try:
                 # Get the RAM data for the final scene in the New Journey scenario. This is our "beating the game".
@@ -231,7 +249,7 @@ class CRContext(CommonContext):
 
                 # Check if the bit for defeating Rahu is set.
                 if boss_defeated_value == 18:
-                    rahu_item_name = "Defeated Rahu III"
+                    rahu_item_name = "Defeat Rahu III"
                     rahu_item_info = ALL_ITEMS_TABLE.get(rahu_item_name)
 
                     # Ensure item data exists
@@ -294,6 +312,8 @@ class CRContext(CommonContext):
                             dolphin.write_bytes(PROG_FLAG_1_ADDR, int_to_bytes(0x07, 1))
                             dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0xF8, 1))
                             dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0x08, 1))
+                            # Custom Screen Access from start of game
+                            dolphin.write_bytes(0x803BF914, int_to_bytes(0x01, 1))
                             self.stored_chapter = current_chapter
                         # Reset battles before moving to Ch 1
                         if bytes_to_int(dolphin.read_bytes(PROG_FLAG_1_ADDR, 1)) & 0x08 > 0:
@@ -303,7 +323,7 @@ class CRContext(CommonContext):
                             dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0x04, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_3_ADDR, 1)) & 0x08 > 0:
+                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_3_ADDR, 1)) & 0x08 > 0 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter:
                                 chap_count += 1
@@ -322,16 +342,20 @@ class CRContext(CommonContext):
                                 case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
                                 case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
                                 case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
-                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
-                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            if ob_mem:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                                self.stored_chapter = next_chap - 1
+                            else:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                                self.stored_chapter = current_chapter - 1
                             #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
                             dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
-                            self.stored_chapter = next_chap-1
+                            self.change_locker = True
                     case 2:
                         if not_yet_set and self.flag_flip:
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) & 0x20 > 0:
+                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) & 0x20 > 0 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter:
                                 chap_count += 1
@@ -350,11 +374,15 @@ class CRContext(CommonContext):
                                 case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
                                 case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
                                 case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
-                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
-                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            if ob_mem:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                                self.stored_chapter = next_chap - 1
+                            else:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                                self.stored_chapter = current_chapter - 1
                             #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
                             dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
-                            self.stored_chapter = next_chap-1
+                            self.change_locker = True
                     case 3:
                         if not_yet_set and self.flag_flip:
                             self.stored_chapter = current_chapter
@@ -363,9 +391,9 @@ class CRContext(CommonContext):
                         if not_yet_set and self.flag_flip:
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) & 0x01 > 0:
+                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) & 0x01 > 0 and not self.change_locker:
                             chap_count = 0
-                            while self.chapter_order[chap_count] != current_chapter:
+                            while self.chapter_order[chap_count] != current_chapter-1:
                                 chap_count += 1
                             next_chap = self.chapter_order[chap_count+1]
                             ob_mem = False # Obtained Memory?
@@ -382,11 +410,15 @@ class CRContext(CommonContext):
                                 case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
                                 case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
                                 case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
-                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
-                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            if ob_mem:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                                self.stored_chapter = next_chap - 1
+                            else:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-2, 1))
+                                self.stored_chapter = current_chapter - 2
                             #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
                             dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
-                            self.stored_chapter = next_chap-1
+                            self.change_locker = True
                     case 5:
                         if not_yet_set and self.flag_flip:
                             dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xE0, 1))
@@ -394,12 +426,13 @@ class CRContext(CommonContext):
                             self.flag_flip = False
                     case 6:
                         if not_yet_set and self.flag_flip:
-                            dolphin.write_bytes(PROG_FLAG_3_ADDR, int_to_bytes(0x08, 1))
+                            dolphin.write_bytes(PROG_FLAG_3_ADDR, int_to_bytes(0x0F, 1))
+                            dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xF0, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) & 0x08 > 0:
+                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) & 0x08 > 0 and not self.change_locker:
                             chap_count = 0
-                            while self.chapter_order[chap_count] != current_chapter:
+                            while self.chapter_order[chap_count] != current_chapter-1:
                                 chap_count += 1
                             next_chap = self.chapter_order[chap_count+1]
                             ob_mem = False # Obtained Memory?
@@ -416,11 +449,15 @@ class CRContext(CommonContext):
                                 case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
                                 case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
                                 case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
-                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
-                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            if ob_mem:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                                self.stored_chapter = next_chap - 1
+                            else:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-2, 1))
+                                self.stored_chapter = current_chapter - 2
                             #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
                             dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
-                            self.stored_chapter = next_chap-1
+                            self.change_locker = True
                     case 7:
                         if not_yet_set and self.flag_flip:
                             dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0x01, 1))
@@ -428,7 +465,7 @@ class CRContext(CommonContext):
                             dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xE1, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_3_ADDR, 1)) & 0x10 > 0:
+                        if self.stored_chapter == current_chapter and battle_wins > 4 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter:
                                 chap_count += 1
@@ -447,18 +484,22 @@ class CRContext(CommonContext):
                                 case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
                                 case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
                                 case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
-                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
-                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            if ob_mem:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                                self.stored_chapter = next_chap - 1
+                            else:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                                self.stored_chapter = current_chapter - 1
                             #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
                             dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
-                            self.stored_chapter = next_chap-1
+                            self.change_locker = True
                     case 8:
                         if not_yet_set and self.flag_flip:
                             dolphin.write_bytes(PROG_FLAG_1_ADDR, int_to_bytes(0x7F, 1))
                             dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0xFC, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_2_ADDR, 1)) & 0x01 > 0:
+                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_2_ADDR, 1)) & 0x01 > 0 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter:
                                 chap_count += 1
@@ -477,17 +518,21 @@ class CRContext(CommonContext):
                                 case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
                                 case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
                                 case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
-                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
-                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            if ob_mem:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                                self.stored_chapter = next_chap - 1
+                            else:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                                self.stored_chapter = current_chapter - 1
                             #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
                             dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
-                            self.stored_chapter = next_chap-1
+                            self.change_locker = True
                     case 9:
                         if not_yet_set and self.flag_flip:
                             dolphin.write_bytes(PROG_FLAG_3_ADDR, int_to_bytes(0x20, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_3_ADDR, 1)) & 0x02 > 0:
+                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_3_ADDR, 1)) & 0x02 > 0 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter:
                                 chap_count += 1
@@ -506,11 +551,15 @@ class CRContext(CommonContext):
                                 case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
                                 case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
                                 case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
-                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
-                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            if ob_mem:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                                self.stored_chapter = next_chap - 1
+                            else:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                                self.stored_chapter = current_chapter - 1
                             #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
                             dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
-                            self.stored_chapter = next_chap-1
+                            self.change_locker = True
                     case 10:
                         if not_yet_set and self.flag_flip:
                             dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0x0F, 1))
@@ -518,7 +567,7 @@ class CRContext(CommonContext):
                             dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xEE, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_1_ADDR, 1)) & 0x20 > 0:
+                        if self.stored_chapter == current_chapter and battle_wins > 7 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter:
                                 chap_count += 1
@@ -537,11 +586,15 @@ class CRContext(CommonContext):
                                 case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
                                 case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
                                 case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
-                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
-                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            if ob_mem:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                                self.stored_chapter = next_chap - 1
+                            else:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                                self.stored_chapter = current_chapter - 1
                             #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
                             dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
-                            self.stored_chapter = next_chap-1
+                            self.change_locker = True
                     case 11:
                         if not_yet_set and self.flag_flip:
                             dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0x20, 1))
@@ -552,9 +605,9 @@ class CRContext(CommonContext):
                             dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0x04, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_2_ADDR, 1)) & 0x01 > 0:
+                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_2_ADDR, 1)) & 0x01 > 0 and not self.change_locker:
                             chap_count = 0
-                            while self.chapter_order[chap_count] != current_chapter:
+                            while self.chapter_order[chap_count] != current_chapter-1:
                                 chap_count += 1
                             next_chap = self.chapter_order[chap_count+1]
                             ob_mem = False # Obtained Memory?
@@ -571,17 +624,21 @@ class CRContext(CommonContext):
                                 case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
                                 case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
                                 case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
-                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
-                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            if ob_mem:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                                self.stored_chapter = next_chap - 1
+                            else:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-2, 1))
+                                self.stored_chapter = current_chapter - 2
                             #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
                             dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
-                            self.stored_chapter = next_chap-1
+                            self.change_locker = True
                     case 13:
                         if not_yet_set and self.flag_flip:
                             dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0x04, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.flag_delay_counter == 0 and bytes_to_int(dolphin.read_bytes(PROG_FLAG_3_ADDR, 1)) & 0x80 > 0:
+                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_3_ADDR, 1)) & 0x80 > 0 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter:
                                 chap_count += 1
@@ -600,20 +657,28 @@ class CRContext(CommonContext):
                                 case 11: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH10_CMP > 0
                                 case 13: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH11_CMP > 0
                                 case 14: ob_mem = bytes_to_int(dolphin.read_bytes(CAI_8_12, 1)) & CH12_CMP > 0
-                            if ob_mem: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
-                            else: dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                            if ob_mem:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(next_chap-1, 1))
+                                self.stored_chapter = next_chap - 1
+                            else:
+                                dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
+                                self.stored_chapter = current_chapter - 1
                             #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
                             dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
-                            self.stored_chapter = next_chap-1
+                            self.change_locker = True
                     case 14:
                         if not_yet_set and self.flag_flip:
                             dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0x04, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
+                        if battle_wins > 8:
+                            self.reset_battles = True
                     case 15:
                         if not_yet_set and self.flag_flip:
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
+                        if battle_wins > 1:
+                            self.reset_battles = True
                     case 16:
                         if not_yet_set and self.flag_flip:
                             self.stored_chapter = current_chapter
@@ -627,7 +692,10 @@ class CRContext(CommonContext):
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
 
-                    # Check for new items.
+                # Failsafe for restarted client
+                if self.stored_chapter == -1: self.stored_chapter = current_chapter
+
+                # Check for new items.
                 try:
                     ram_bytes = dolphin.read_bytes(LAST_RECV_ITEM_ADDR, 4)
                     last_recv_idx = int.from_bytes(ram_bytes, "big")

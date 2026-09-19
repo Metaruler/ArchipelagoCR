@@ -34,13 +34,13 @@ class CRItem(Item):
 # Begin item list for AP
 # Items indicating chapter unlocks
 SCENARIO_TABLE: dict[str, CRItemData] = {
-    "Chapter 2 Memories": CRItemData(
-        name="Chapter 2 Memories",
-        type="Chapter Access",
-        code=502,
-        classification=IC.progression,
-        update_ram_addr=[]
-    ),
+    #"Chapter 2 Memories": CRItemData(
+    #    name="Chapter 2 Memories",
+    #    type="Chapter Access",
+    #    code=502,
+    #    classification=IC.progression,
+    #    update_ram_addr=[]
+    #),
     "Chapter 3 Memories": CRItemData(
         name="Chapter 3 Memories",
         type="Chapter Access",

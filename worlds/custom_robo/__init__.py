@@ -44,7 +44,7 @@ class CRWorld(World):
     options: CROptions
     topology_present = False
     settings: CRSettings
-    chapter_order = []
+    chapter_order = [1]
 
     item_name_to_id: ClassVar[dict[str, int]] = {
         name: data.code for name, data in ALL_ITEMS_TABLE.items()
@@ -65,8 +65,8 @@ class CRWorld(World):
     def create_regions(self):
         # Add all regions
         chapter_1_region = Region("Chapter 1 - Steel Hearts", self.player, self.multiworld)
+        chapter_2_region = Region("Chapter 2 - Test Hall Trials", self.player, self.multiworld)
         region_data = {
-            "Chapter 2 - Test Hall Trials": "Chapter 2 Memories",
             "Chapter 3 - License Test": "Chapter 3 Memories",
             "Chapter 4 - Family Matters": "Chapter 4 Memories",
             "Chapter 5 - Shiner Style": "Chapter 5 Memories",
@@ -90,10 +90,13 @@ class CRWorld(World):
                     menu_region
                 )
                 menu_region.locations.append(location)
+        # Assemble static chapters
         self.multiworld.regions.append(menu_region)
         self.multiworld.regions.append(chapter_1_region)
         menu_region.connect(chapter_1_region)
         previous_region = chapter_1_region
+        self.multiworld.regions.append(chapter_2_region)
+        previous_region.connect(chapter_2_region)
 
         # Shuffle chapter order if desired
         shuffled_region_names = list(region_data.keys())
@@ -104,7 +107,7 @@ class CRWorld(World):
             new_region = Region(region_name, self.player, self.multiworld)
             self.multiworld.regions.append(new_region)
             match region_name:
-                case "Chapter 2 - Test Hall Trials": self.chapter_order.append(1)
+                # case "Chapter 2 - Test Hall Trials": self.chapter_order.append(1)
                 case "Chapter 3 - License Test": self.chapter_order.append(2)
                 case "Chapter 4 - Family Matters": self.chapter_order.append(3)
                 case "Chapter 5 - Shiner Style": self.chapter_order.append(5)

@@ -12,7 +12,7 @@ class CRLocationData(NamedTuple):
   parent_region: str = ""
   parent_ch: int = 0
 
-BATTLE_COUNTER_ADDR = 0x803BF9D9
+BATTLE_COUNTER_ADDR = 0x803BF9C9
 CHAPTER_COUNTER_ADDR = 0x803BE7A7
 
 PROG_FLAG_1_ADDR = 0x803BF948
@@ -562,7 +562,6 @@ PART_USE: dict[str, CRLocationData] = {
     type = "Part Use"
   ),
   "Use Tomahawk G Bomb": CRLocationData(
-    # TODO FIX NUMBERING
     code=187,
     ram_addr=CRRamData(0x803BFBE6, bit_position=7),
     type = "Part Use"
