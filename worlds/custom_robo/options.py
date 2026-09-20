@@ -13,9 +13,19 @@ class StartingParts(Choice):
     internal_name = "starting_parts"
     option_standard = 0
     option_randomized = 1
+    option_can = 2
+    default = 0
+
+class ChapterOrder(Choice):
+    """Select whether you want Standard or Randomized chapter order"""
+    display_name = "Chapter Order"
+    internal_name = "chapter_order"
+    option_standard = 0
+    option_shuffled = 1
     default = 0
 
 @dataclass
 class CROptions(PerGameCommonOptions):
 #    illegal_parts_enabled: IllegalPartsEnabled
     starting_parts: StartingParts
+    chapter_order: ChapterOrder

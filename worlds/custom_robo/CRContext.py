@@ -18,6 +18,7 @@ from .items import ALL_ITEMS_TABLE, PARTS_ITEM_TABLE, PROGRESSION_RAHU
 
 from worlds.tww.TWWClient import read_string
 from ..oot.Messages import bytes_to_int, int_to_bytes
+from ..smw.Names.TextBox import string_to_bytes
 
 WAIT_TIMER_SHORT_TIMEOUT: float = 0.125
 
@@ -111,7 +112,16 @@ class CRContext(CommonContext):
         match cmd:
             case "Connected":
                 self.arg_seed = "CR" + str(slot_data["seed"])
+                chapters = slot_data["chapter_order"]
+                chapters_str = ""
+                past_start = False
+                for ch in chapters:
+                    if past_start: chapters_str += ", "
+                    chapters_str += str(ch)
+                    past_start = True
+                logger.info("Chapter Order: " + chapters_str)
                 self.game_running = True
+
 
     async def disconnect(self, allow_autoreconnect = False):
         await super().disconnect(allow_autoreconnect)
@@ -348,6 +358,8 @@ class CRContext(CommonContext):
                             else:
                                 dolphin.write_bytes(CHAPTER_INDEX_ADDR, int_to_bytes(current_chapter-1, 1))
                                 self.stored_chapter = current_chapter - 1
+                                # chapter_string = "Get Ch" + f"{next_chap:02}" + " memory"
+                                # dolphin.write_bytes(0x808ED47F, bytes(string_to_bytes(chapter_string)))
                             #dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xFF, 1)) # Prevents error in flag settings
                             dolphin.write_bytes(BATTLE_COUNTER_ADDR, int_to_bytes(0x00, 1))
                             self.change_locker = True
@@ -355,7 +367,7 @@ class CRContext(CommonContext):
                         if not_yet_set and self.flag_flip:
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) & 0x20 > 0 and not self.change_locker:
+                        if self.stored_chapter == current_chapter and battle_wins > 0 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter:
                                 chap_count += 1
@@ -391,7 +403,7 @@ class CRContext(CommonContext):
                         if not_yet_set and self.flag_flip:
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) & 0x01 > 0 and not self.change_locker:
+                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) & 0x02 > 0 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter-1:
                                 chap_count += 1
@@ -430,7 +442,7 @@ class CRContext(CommonContext):
                             dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0xF0, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_4_ADDR, 1)) & 0x08 > 0 and not self.change_locker:
+                        if self.stored_chapter == current_chapter and battle_wins > 4 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter-1:
                                 chap_count += 1
@@ -499,7 +511,7 @@ class CRContext(CommonContext):
                             dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0xFC, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_2_ADDR, 1)) & 0x01 > 0 and not self.change_locker:
+                        if self.stored_chapter == current_chapter and battle_wins > 3 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter:
                                 chap_count += 1
@@ -532,7 +544,7 @@ class CRContext(CommonContext):
                             dolphin.write_bytes(PROG_FLAG_3_ADDR, int_to_bytes(0x20, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_3_ADDR, 1)) & 0x02 > 0 and not self.change_locker:
+                        if self.stored_chapter == current_chapter and battle_wins > 1 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter:
                                 chap_count += 1
@@ -605,7 +617,7 @@ class CRContext(CommonContext):
                             dolphin.write_bytes(PROG_FLAG_4_ADDR, int_to_bytes(0x04, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_2_ADDR, 1)) & 0x01 > 0 and not self.change_locker:
+                        if self.stored_chapter == current_chapter and battle_wins > 6 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter-1:
                                 chap_count += 1
@@ -638,7 +650,7 @@ class CRContext(CommonContext):
                             dolphin.write_bytes(PROG_FLAG_2_ADDR, int_to_bytes(0x04, 1))
                             self.stored_chapter = current_chapter
                             self.flag_flip = False
-                        if self.stored_chapter == current_chapter and bytes_to_int(dolphin.read_bytes(PROG_FLAG_3_ADDR, 1)) & 0x80 > 0 and not self.change_locker:
+                        if self.stored_chapter == current_chapter and battle_wins > 1 and not self.change_locker:
                             chap_count = 0
                             while self.chapter_order[chap_count] != current_chapter:
                                 chap_count += 1

@@ -6,7 +6,7 @@ import os
 # AP Related Imports
 from BaseClasses import Item, Region, Location
 from worlds.AutoWorld import WebWorld, World
-from worlds.LauncherComponents import launch_subprocess, Component, components, Type, SuffixIdentifier
+from worlds.LauncherComponents import launch_subprocess, Component, components, Type, SuffixIdentifier, icon_paths
 
 # Relative Imports
 from .helpers import *
@@ -28,8 +28,9 @@ components.append(
               description="Client to interface with Custom Robo AP",
               func=run_client,
               component_type=Type.CLIENT,
-              file_identifier=SuffixIdentifier(".apcr"))
-)
+              file_identifier=SuffixIdentifier(".apcr"),
+              icon = "ArchipelagoCR_Icon"))
+icon_paths["ArchipelagoCR_Icon"] = f"ap:{__name__}/ArchipelagoCR_Icon.png"
 
 class CRWeb(WebWorld):
     theme = "stone"
@@ -44,7 +45,8 @@ class CRWorld(World):
     options: CROptions
     topology_present = False
     settings: CRSettings
-    chapter_order = [1]
+    chapter_order_number = [1]
+    chapter_order_names = [1]
 
     item_name_to_id: ClassVar[dict[str, int]] = {
         name: data.code for name, data in ALL_ITEMS_TABLE.items()
@@ -100,26 +102,48 @@ class CRWorld(World):
 
         # Shuffle chapter order if desired
         shuffled_region_names = list(region_data.keys())
-        random.shuffle(shuffled_region_names)
+        if self.options.chapter_order.value == self.options.chapter_order.option_shuffled:
+            random.shuffle(shuffled_region_names)
         # Create regions from all other chapters
+        self.chapter_order_names.append(2)
         for region_name in shuffled_region_names:
             access_condition = region_data.get(region_name)
             new_region = Region(region_name, self.player, self.multiworld)
             self.multiworld.regions.append(new_region)
             match region_name:
                 # case "Chapter 2 - Test Hall Trials": self.chapter_order.append(1)
-                case "Chapter 3 - License Test": self.chapter_order.append(2)
-                case "Chapter 4 - Family Matters": self.chapter_order.append(3)
-                case "Chapter 5 - Shiner Style": self.chapter_order.append(5)
-                case "Chapter 6 - Gym Tourney": self.chapter_order.append(7)
-                case "Chapter 7 - Lab Guard Duty": self.chapter_order.append(8)
-                case "Chapter 8 - Rahu Appears": self.chapter_order.append(9)
-                case "Chapter 9 - Police 2v2": self.chapter_order.append(10)
-                case "Chapter 10 - Secret Police": self.chapter_order.append(11)
-                case "Chapter 11 - Rahu Returns": self.chapter_order.append(13)
+                case "Chapter 3 - License Test":
+                    self.chapter_order_number.append(2)
+                    self.chapter_order_names.append(3)
+                case "Chapter 4 - Family Matters":
+                    self.chapter_order_number.append(3)
+                    self.chapter_order_names.append(4)
+                case "Chapter 5 - Shiner Style":
+                    self.chapter_order_number.append(5)
+                    self.chapter_order_names.append(5)
+                case "Chapter 6 - Gym Tourney":
+                    self.chapter_order_number.append(7)
+                    self.chapter_order_names.append(6)
+                case "Chapter 7 - Lab Guard Duty":
+                    self.chapter_order_number.append(8)
+                    self.chapter_order_names.append(7)
+                case "Chapter 8 - Rahu Appears":
+                    self.chapter_order_number.append(9)
+                    self.chapter_order_names.append(8)
+                case "Chapter 9 - Police 2v2":
+                    self.chapter_order_number.append(10)
+                    self.chapter_order_names.append(9)
+                case "Chapter 10 - Secret Police":
+                    self.chapter_order_number.append(11)
+                    self.chapter_order_names.append(10)
+                case "Chapter 11 - Rahu Returns":
+                    self.chapter_order_number.append(13)
+                    self.chapter_order_names.append(11)
             previous_region.connect(new_region, rule=lambda state, access_mem=access_condition: state.has(access_mem, self.player))
             previous_region = new_region
         # Manually add the last regions to prevent shuffle
+        self.chapter_order_names.append(12)
+        self.chapter_order_names.append(13)
         new_region = Region("Chapter 12 - To The Outside", self.player, self.multiworld)
         self.multiworld.regions.append(new_region)
         previous_region.connect(new_region, rule=lambda state, access_mem="Dad's Watch": state.has(access_mem, self.player))
@@ -219,6 +243,16 @@ class CRWorld(World):
                     starting_parts.append(self.create_item(item_name))
                 else:
                     item_pool.append(self.create_item(item_name))
+        # Start will all Can Parts (for the fans)
+        elif self.options.starting_parts.value == self.options.starting_parts.option_can:
+            print("Can selected")
+            for item_name, item_data in PARTS_ITEM_TABLE.items():
+                #if item_data.illegal == False | self.options.illegal_parts_enabled.value:
+                if (item_name == "Oil Can" or item_name == "Can Gun" or item_name == "Can Bomb"
+                        or item_name == "Can Pod" or item_name == "Can Legs"):
+                    starting_parts.append(self.create_item(item_name))
+                else:
+                    item_pool.append(self.create_item(item_name))
 
         # Add all Rahu Evolution progression parts to the pool
         rahu_evo_total = len(PROGRESSION_RAHU.get("Rahu Evolution Steps"))
@@ -270,7 +304,7 @@ class CRWorld(World):
             "Name": self.player_name,
             "Locations": {},
             "APWorldVersion": CLIENT_VERSION,
-            "ChapterOrder": self.chapter_order
+            "ChapterOrder": self.chapter_order_number
         }
         # Create a zip (container) that will contain all the necessary output files for us to use during patching.
         cr_container = CRPlayerContainer(output_data, patch_path, self.multiworld.player_name[self.player], self.player)
@@ -282,5 +316,7 @@ class CRWorld(World):
             "seed": self.multiworld.seed,
 #            "illegal_parts_enabled": self.options.illegal_parts_enabled.value,
             "starting_parts": self.options.starting_parts.value,
-            "total_locations": len(LOCATION_TABLE)
+            "chapters": self.options.chapter_order.value,
+            "total_locations": len(LOCATION_TABLE),
+            "chapter_order": self.chapter_order_names
         }

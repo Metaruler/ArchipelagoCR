@@ -35,7 +35,7 @@ def sync_main(*launch_args: str):
     parser.add_argument('apcr_file', default="", type=str, nargs="?", help="Path to an APCR file")
     args = parser.parse_args(launch_args)
 
-    # Patch (will be used for future rando)
+    # Patch stuff
     if args.apcr_file:
         from .CRPatcher import CRPatcher
         cr_patch = CRPatcher(args.apcr_file)
