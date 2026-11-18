@@ -45,8 +45,8 @@ class CRWorld(World):
     options: CROptions
     topology_present = False
     settings: CRSettings
-    chapter_order_number = [1]
-    chapter_order_names = [1]
+    chapter_order_number:list
+    chapter_order_names:list
 
     item_name_to_id: ClassVar[dict[str, int]] = {
         name: data.code for name, data in ALL_ITEMS_TABLE.items()
@@ -65,6 +65,8 @@ class CRWorld(World):
         return slot_data
 
     def create_regions(self):
+        self.chapter_order_number = [1]
+        self.chapter_order_names = [1]
         # Add all regions
         chapter_1_region = Region("Chapter 1 - Steel Hearts", self.player, self.multiworld)
         chapter_2_region = Region("Chapter 2 - Test Hall Trials", self.player, self.multiworld)
